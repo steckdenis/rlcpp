@@ -25,11 +25,21 @@ void TableModel::learn(const std::vector<Episode *> &episodes)
     std::vector<float> values;
 
     for (Episode *episode : episodes) {
-        for (unsigned int t=0; t<episode->length(); ++t) {
+        for (unsigned int t=0; t < episode->length() - 1; ++t) {
+            unsigned int action = episode->action(t);
+
             episode->state(t, state);
             episode->values(t, values);
 
-            _table[state] = values;
+            // Update the value associated to the action that was taken, or
+            // populate the table if this state was never encountered.
+            auto it = _table.find(state);
+
+            if (it == _table.end()) {
+                _table[state] = values;
+            } else {
+                it->second[action] = values[action];
+            }
         }
     }
 }

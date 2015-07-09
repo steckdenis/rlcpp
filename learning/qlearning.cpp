@@ -15,12 +15,12 @@ void QLearning::actions(Episode *episode, std::vector<float> &probabilities)
     std::vector<float> &current_values = probabilities;             // Reuse temporary vectors
 
     if (episode->length() >= 2) {
-        unsigned int last_t = episode->length() - 1;
-        unsigned int last_action = episode->action(last_t - 1);
-        float last_reward = episode->reward(last_t - 1);
+        unsigned int last_t = episode->length() - 2;
+        unsigned int last_action = episode->action(last_t);
+        float last_reward = episode->reward(last_t);
 
-        episode->values(last_t - 1, _last_values);
-        episode->values(last_t, current_values);
+        episode->values(last_t, _last_values);
+        episode->values(last_t + 1, current_values);
 
         float Q = _last_values[last_action];
         float error =
@@ -28,7 +28,7 @@ void QLearning::actions(Episode *episode, std::vector<float> &probabilities)
             _discount_factor * *std::max_element(current_values.begin(), current_values.end())
             - Q;
 
-        episode->updateValue(last_t - 1, last_action, Q + _learning_rate * error);
+        episode->updateValue(last_t, last_action, Q + _learning_rate * error);
     }
 
     // probabilities (alias current_values) contains the values of the last state

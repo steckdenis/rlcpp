@@ -32,6 +32,7 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
         Episode *episode = new Episode(_num_actions);
 
         // Initial state
+        reset();
         initialState(state);
         episode->addState(state);
 
@@ -50,11 +51,10 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
             // Choose an action according to the probabilities
             float rnd = float(std::rand() % 65536) / 65536.0f;
             float acc = 0.0f;
-            float inc = 1.0f / float(episode->valueSize());
             unsigned int action;
 
             for (action = 0; action < episode->valueSize(); ++action) {
-                acc += inc;
+                acc += values[action];
 
                 if (acc > rnd) {
                     break;
@@ -70,6 +70,8 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
 
             model->values(episode, values);
             episode->addValues(values);
+
+            steps++;
         }
 
         // Let the learning update the values of the last state that has been visited
@@ -82,6 +84,7 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
         std::cout << "[Episode " << e << "] " << episode->cumulativeReward() << std::endl;
 
         if (learn_episodes.size() == batch_size) {
+            std::cout << "Learning batch" << std::endl;
             model->learn(learn_episodes);
             learn_episodes.clear();
         }
