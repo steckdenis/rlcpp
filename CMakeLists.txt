@@ -7,6 +7,7 @@ set(SOURCES
     model/tablemodel.cpp
     learning/qlearning.cpp
     world/abstractworld.cpp
+    world/gridworld.cpp
     main.cpp
 )
 

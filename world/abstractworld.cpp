@@ -48,7 +48,7 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
             learning->actions(episode, values);
 
             // Choose an action according to the probabilities
-            float rnd = float(std::rand() % 65535) / 65535.0f;
+            float rnd = float(std::rand() % 65536) / 65536.0f;
             float acc = 0.0f;
             float inc = 1.0f / float(episode->valueSize());
             unsigned int action;
