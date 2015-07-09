@@ -1,6 +1,7 @@
 #include "episode.h"
 
 #include <algorithm>
+#include <numeric>
 
 template<typename T>
 void extend(std::vector<T> &dest, const std::vector<T> &src)
@@ -27,9 +28,9 @@ static std::vector<float> extract(const std::vector<float> &vector,
     std::copy(vector.begin() + from, vector.begin() + to, rs.begin());
 }
 
-Episode::Episode()
+Episode::Episode(unsigned int value_size)
 : _state_size(0),
-  _value_size(0)
+  _value_size(value_size)
 {
 }
 
@@ -43,9 +44,6 @@ void Episode::addState(const std::vector<float> &state)
 
 void Episode::addValues(const std::vector<float> &values)
 {
-    // Update the value size, used to split the values stored in _values by value tuple
-    _value_size = values.size();
-
     extend(_values, values);
 }
 
@@ -92,6 +90,11 @@ void Episode::updateValue(unsigned int t, unsigned int action, float value)
 float Episode::reward(unsigned int t) const
 {
     return _rewards[t];
+}
+
+float Episode::cumulativeReward() const
+{
+    return std::accumulate(_rewards.begin(), _rewards.end(), 0.0f);
 }
 
 float Episode::action(unsigned int t) const

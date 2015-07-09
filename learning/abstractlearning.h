@@ -13,7 +13,7 @@ class AbstractLearning
 {
     public:
         AbstractLearning() {}
-        ~AbstractLearning() {}
+        virtual ~AbstractLearning() {}
 
         virtual void actions(Episode *episode, std::vector<float> &probabilities) = 0;
 };

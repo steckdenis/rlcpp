@@ -6,6 +6,7 @@ set(SOURCES
     model/episode.cpp
     model/tablemodel.cpp
     learning/qlearning.cpp
+    world/abstractworld.cpp
     main.cpp
 )
 

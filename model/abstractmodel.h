@@ -12,7 +12,7 @@ class AbstractModel
 {
     public:
         AbstractModel() {}
-        ~AbstractModel() {}
+        virtual ~AbstractModel() {}
 
         /**
          * @brief Update the model using the action values of the @p episodes

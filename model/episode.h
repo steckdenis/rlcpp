@@ -17,7 +17,7 @@
 class Episode
 {
     public:
-        Episode();
+        Episode(unsigned int value_size);
 
         /**
          * @brief Add a state to the episode.
@@ -79,6 +79,11 @@ class Episode
          * @brief Reward at a given time step
          */
         float reward(unsigned int t) const;
+
+        /**
+         * @brief Cumulative reward of this episode
+         */
+        float cumulativeReward() const;
 
         /**
          * @brief Action taken at a given time step
