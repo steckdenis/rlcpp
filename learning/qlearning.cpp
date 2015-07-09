@@ -16,8 +16,8 @@ void QLearning::actions(Episode *episode, std::vector<float> &probabilities)
 
     if (episode->length() >= 2) {
         unsigned int last_t = episode->length() - 1;
-        unsigned int last_action = episode->action(last_t);
-        float last_reward = episode->reward(last_t);
+        unsigned int last_action = episode->action(last_t - 1);
+        float last_reward = episode->reward(last_t - 1);
 
         episode->values(last_t - 1, _last_values);
         episode->values(last_t, current_values);

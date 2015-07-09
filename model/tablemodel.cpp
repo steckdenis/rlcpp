@@ -2,6 +2,7 @@
 #include "episode.h"
 
 #include <algorithm>
+#include <iostream>
 
 void TableModel::values(Episode *episode, std::vector<float> &rs)
 {
@@ -24,13 +25,12 @@ void TableModel::learn(const std::vector<Episode *> &episodes)
     std::vector<float> values;
 
     for (Episode *episode : episodes) {
-        // Store the value of the last state of each episode
-        unsigned int last_t = episode->length() - 1;
+        for (unsigned int t=0; t<episode->length(); ++t) {
+            episode->state(t, state);
+            episode->values(t, values);
 
-        episode->state(last_t, state);
-        episode->values(last_t, values);
-
-        _table[state] = values;
+            _table[state] = values;
+        }
     }
 }
 

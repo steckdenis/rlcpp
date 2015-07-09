@@ -7,16 +7,18 @@ template<typename T>
 void extend(std::vector<T> &dest, const std::vector<T> &src)
 {
     // Make room in dest for src
-    dest.resize(dest.size() + src.size());
+    std::size_t offset = dest.size();
+
+    dest.resize(offset + src.size());
 
     // Append src to dest
-    std::copy(src.begin(), src.end(), dest.end() - src.size());
+    std::copy(src.begin(), src.end(), dest.begin() + offset);
 }
 
-static std::vector<float> extract(const std::vector<float> &vector,
-                                  unsigned int size,
-                                  unsigned int t,
-                                  std::vector<float> &rs)
+static void extract(const std::vector<float> &vector,
+                    unsigned int size,
+                    unsigned int t,
+                    std::vector<float> &rs)
 {
     rs.resize(size);
 
@@ -69,7 +71,7 @@ unsigned int Episode::valueSize() const
 
 unsigned int Episode::length() const
 {
-    return _values.size() / _value_size;
+    return _states.size() / _state_size;
 }
 
 void Episode::state(unsigned int t, std::vector<float> &rs) const
