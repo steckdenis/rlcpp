@@ -12,16 +12,19 @@ void extend(std::vector<T> &dest, const std::vector<T> &src)
     std::copy(src.begin(), src.end(), dest.end() - src.size());
 }
 
-static std::vector<float> extract(const std::vector<float> &vector, unsigned int size, unsigned int t)
+static std::vector<float> extract(const std::vector<float> &vector,
+                                  unsigned int size,
+                                  unsigned int t,
+                                  std::vector<float> &rs)
 {
-    std::vector<float> result(size);
+    rs.resize(size);
 
     // Compute the positions between which the desired state values are stored
     unsigned int from = t * size;
     unsigned int to = from + size;
 
     // Copy the desired values into the output
-    std::copy(vector.begin() + from, vector.begin() + to, result.begin());
+    std::copy(vector.begin() + from, vector.begin() + to, rs.begin());
 }
 
 Episode::Episode()
@@ -71,14 +74,19 @@ unsigned int Episode::length() const
     return _values.size() / _value_size;
 }
 
-std::vector<float> Episode::state(unsigned int t) const
+void Episode::state(unsigned int t, std::vector<float> &rs) const
 {
-    return extract(_states, _state_size, t);
+    extract(_states, _state_size, t, rs);
 }
 
-std::vector<float> Episode::values(unsigned int t) const
+void Episode::values(unsigned int t, std::vector<float> &rs) const
 {
-    return extract(_values, _value_size, t);
+    extract(_values, _value_size, t, rs);
+}
+
+void Episode::updateValue(unsigned int t, unsigned int action, float value)
+{
+    _values[t * _value_size + action] = value;
 }
 
 float Episode::reward(unsigned int t) const

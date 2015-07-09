@@ -14,7 +14,7 @@
 class TableModel : public AbstractModel
 {
     public:
-        virtual std::vector<float> values(Episode *episode);
+        virtual void values(Episode *episode, std::vector<float> &rs);
         virtual void learn(const std::vector<Episode *> &episodes);
 
     private:

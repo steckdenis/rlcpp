@@ -63,12 +63,17 @@ class Episode
         /**
          * @brief Observation for a given time step
          */
-        std::vector<float> state(unsigned int t) const;
+        void state(unsigned int t, std::vector<float> &rs) const;
 
         /**
          * @brief Set of action values for a given time step
          */
-        std::vector<float> values(unsigned int t) const;
+        void values(unsigned int t, std::vector<float> &rs) const;
+
+        /**
+         * @brief Update the value of an action
+         */
+        void updateValue(unsigned int t, unsigned int action, float value);
 
         /**
          * @brief Reward at a given time step

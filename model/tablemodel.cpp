@@ -3,25 +3,34 @@
 
 #include <algorithm>
 
-std::vector<float> TableModel::values(Episode *episode)
+void TableModel::values(Episode *episode, std::vector<float> &rs)
 {
-    auto it = _table.find(episode->state(episode->length() - 1));
+    episode->state(episode->length() - 1, rs);
+    auto it = _table.find(rs);
 
     if (it == _table.end()) {
         // Return zeroes if nothing is stored in the table
-        return std::vector<float>(episode->valueSize());
+        rs.resize(episode->valueSize());
+        std::fill(rs.begin(), rs.end(), 0.0f);
     } else {
-        return it->second;
+        // Return the value stored in the model
+        rs = it->second;
     }
 }
 
 void TableModel::learn(const std::vector<Episode *> &episodes)
 {
+    std::vector<float> state;
+    std::vector<float> values;
+
     for (Episode *episode : episodes) {
         // Store the value of the last state of each episode
         unsigned int last_t = episode->length() - 1;
 
-        _table[episode->state(last_t)] = episode->values(last_t);
+        episode->state(last_t, state);
+        episode->values(last_t, values);
+
+        _table[state] = values;
     }
 }
 

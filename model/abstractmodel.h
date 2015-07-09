@@ -23,7 +23,7 @@ class AbstractModel
          * @brief Return the action values corresponding to the last state of
          *        @p episode.
          */
-        virtual std::vector<float> values(Episode *episode) = 0;
+        virtual void values(Episode *episode, std::vector<float> &rs) = 0;
 };
 
 #endif
