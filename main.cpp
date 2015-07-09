@@ -1,6 +1,7 @@
 #include <learning/qlearning.h>
 #include <learning/advantagelearning.h>
 #include <learning/softmaxlearning.h>
+#include <learning/egreedylearning.h>
 #include <model/tablemodel.h>
 #include <world/gridworld.h>
 
@@ -44,6 +45,13 @@ int main(int argc, char **argv) {
             }
 
             learning = new SoftmaxLearning(learning, 0.2);
+        } else if (arg == "egreedy") {
+            if (learning == nullptr) {
+                std::cerr << "Put egreedy after the learning algorithm to be filtered" << std::endl;
+                return 1;
+            }
+
+            learning = new EGreedyLearning(learning, 0.2);
         }
     }
 

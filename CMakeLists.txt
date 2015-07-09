@@ -8,6 +8,7 @@ set(SOURCES
     learning/qlearning.cpp
     learning/advantagelearning.cpp
     learning/softmaxlearning.cpp
+    learning/egreedylearning.cpp
     world/abstractworld.cpp
     world/gridworld.cpp
     main.cpp
