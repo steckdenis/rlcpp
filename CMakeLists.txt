@@ -6,6 +6,7 @@ set(SOURCES
     model/episode.cpp
     model/tablemodel.cpp
     learning/qlearning.cpp
+    learning/advantagelearning.cpp
     learning/softmaxlearning.cpp
     world/abstractworld.cpp
     world/gridworld.cpp

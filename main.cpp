@@ -1,4 +1,5 @@
 #include <learning/qlearning.h>
+#include <learning/advantagelearning.h>
 #include <learning/softmaxlearning.h>
 #include <model/tablemodel.h>
 #include <world/gridworld.h>
@@ -34,6 +35,8 @@ int main(int argc, char **argv) {
             model = new TableModel;
         } else if (arg == "qlearning") {
             learning = new QLearning(0.9, 0.3);
+        } else if (arg == "advantage") {
+            learning = new AdvantageLearning(0.9, 0.3, 0.5);
         } else if (arg == "softmax") {
             if (learning == nullptr) {
                 std::cerr << "Put softmax after the learning algorithm to be filtered" << std::endl;
