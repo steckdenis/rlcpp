@@ -1,8 +1,13 @@
 project(rlcpp)
 add_definitions(-std=c++11)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(EIGEN3 eigen3 REQUIRED)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${EIGEN3_INCLUDE_DIRS})
 
 set(SOURCES
+    functionapproximators/gaussianmixture.cpp
     model/episode.cpp
     model/tablemodel.cpp
     learning/qlearning.cpp
