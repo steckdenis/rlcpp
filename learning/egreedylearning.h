@@ -14,6 +14,7 @@ class EGreedyLearning : public AbstractLearning
          * @param epsilon Probability that an exploratory step is taken
          */
         EGreedyLearning(AbstractLearning *learning, float epsilon);
+        virtual ~EGreedyLearning();
 
         virtual void actions(Episode *episode, std::vector<float> &probabilities);
 

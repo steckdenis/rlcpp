@@ -19,6 +19,7 @@ set(SOURCES
     learning/egreedylearning.cpp
     world/abstractworld.cpp
     world/gridworld.cpp
+    world/oneofnworld.cpp
     main.cpp
 )
 

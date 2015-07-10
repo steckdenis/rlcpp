@@ -9,6 +9,11 @@ SoftmaxLearning::SoftmaxLearning(AbstractLearning *learning, float temperature)
 {
 }
 
+SoftmaxLearning::~SoftmaxLearning()
+{
+    delete _learning;
+}
+
 void SoftmaxLearning::actions(Episode *episode, std::vector<float> &probabilities)
 {
 

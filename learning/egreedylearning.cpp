@@ -9,6 +9,11 @@ EGreedyLearning::EGreedyLearning(AbstractLearning *learning, float epsilon)
 {
 }
 
+EGreedyLearning::~EGreedyLearning()
+{
+    delete _learning;
+}
+
 void EGreedyLearning::actions(Episode *episode, std::vector<float> &probabilities)
 {
 

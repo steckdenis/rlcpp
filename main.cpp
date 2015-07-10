@@ -6,6 +6,7 @@
 #include <model/gaussianmixturemodel.h>
 #include <model/nnetmodel.h>
 #include <world/gridworld.h>
+#include <world/oneofnworld.h>
 
 #include <string>
 #include <fstream>
@@ -34,6 +35,12 @@ int main(int argc, char **argv) {
             goal.y = 2;
 
             world = new GridWorld(10, 5, initial, obstacle, goal, arg == "stochasticgridworld");
+        } else if (arg == "oneofn") {
+            if (world == nullptr) {
+                std::cerr << "Put oneofn after the world to be wrapped" << std::endl;
+                return 1;
+            }
+            world = new OneOfNWorld(world, {0, 0}, {9, 4});
         } else if (arg == "table") {
             model = new TableModel;
         } else if (arg == "gaussian") {
