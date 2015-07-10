@@ -5,13 +5,19 @@
 
 #include <alloca.h>
 
-#define NEW_VEC (float *)alloca(_weights.size() * sizeof(float))
+#define NEW_VEC (float *)alloca(numberOfClusters() * sizeof(float))
 
 GaussianMixture::GaussianMixture(float var_initial, float novelty)
 : _var_initial(var_initial),
   _novelty(novelty)
 {
 }
+
+unsigned int GaussianMixture::numberOfClusters() const
+{
+    return _weights.size();
+}
+
 
 float GaussianMixture::value(const Eigen::VectorXf &input) const
 {
@@ -20,7 +26,7 @@ float GaussianMixture::value(const Eigen::VectorXf &input) const
 
     probabilitiesOfClusters(probabilities, input, NAN);
 
-    for (std::size_t cluster=0; cluster<_weights.size(); ++cluster) {
+    for (std::size_t cluster=0; cluster<numberOfClusters(); ++cluster) {
         rs += _weights[cluster] * probabilities[cluster];
     }
 
@@ -30,17 +36,14 @@ float GaussianMixture::value(const Eigen::VectorXf &input) const
 void GaussianMixture::setValue(const Eigen::VectorXf &input, float value)
 {
     int D = input.rows();
-    float sum_sp = _weights.size() == 0 ? 1.0f : std::accumulate(_sprobabilities.begin(), _sprobabilities.end(), 0.0f);
+    float sum_sp = numberOfClusters() == 0 ? 1.0f : std::accumulate(_sprobabilities.begin(), _sprobabilities.end(), 0.0f);
 
     // If the probability of one cluster is above its novelty, an existing
     // cluster can be reused.
-    float *input_probabilities = NEW_VEC;
     bool create_new_cluster = true;
 
-    probabilitiesOfInputs(input_probabilities, input, value);
-
-    for (std::size_t cluster=0; cluster<_weights.size(); ++cluster) {
-        if (input_probabilities[cluster] > _gaussian_normalizations[cluster] * _novelty) {
+    for (std::size_t cluster=0; cluster<numberOfClusters(); ++cluster) {
+        if (probabilityOfInput(cluster, input) > _gaussian_normalizations[cluster] * _novelty) {
             create_new_cluster = false;
             break;
         }
@@ -63,17 +66,19 @@ void GaussianMixture::setValue(const Eigen::VectorXf &input, float value)
         // Adjust the probabilities of the other clusters
         float inv_sum_sp = 1.0f / (sum_sp + 1.0f);
 
-        for (std::size_t cluster=0; cluster<_weights.size()-1; ++cluster) {
+        for (std::size_t cluster=0; cluster<numberOfClusters()-1; ++cluster) {
             _probabilities[cluster] = _sprobabilities[cluster] * inv_sum_sp;
         }
     } else {
         // Probabilities of the clusters given the inputs
         float *cluster_probabilities = NEW_VEC;
+        float *input_probabilities = NEW_VEC;
 
+        probabilitiesOfInputs(input_probabilities, input, value);
         probabilitiesOfClusters(cluster_probabilities, input_probabilities);
 
         // Find the cluster with the greatest probability
-        auto it = std::max_element(input_probabilities, input_probabilities + _weights.size());
+        auto it = std::max_element(input_probabilities, input_probabilities + numberOfClusters());
         int cluster = std::distance(input_probabilities, it);
         float proba = cluster_probabilities[cluster];
 
@@ -90,7 +95,7 @@ void GaussianMixture::setValue(const Eigen::VectorXf &input, float value)
         _means[cluster] += delta_mean_factor;
         _weights[cluster] += learning_factor * (value - _weights[cluster]);
         _covariances[cluster] = _covariances[cluster] +
-                                //delta_mean_factor * delta_mean_factor.transpose() +
+                                delta_mean_factor * delta_mean_factor.transpose() +
                                 learning_factor * (
                                     delta_prev_mean * delta_prev_mean.transpose() -
                                     _covariances[cluster]
@@ -114,10 +119,7 @@ float GaussianMixture::probabilityOfInput(unsigned int cluster, const Eigen::Vec
 void GaussianMixture::probabilitiesOfInputs(float *out, const Eigen::VectorXf &input, float value) const
 {
     // Probability of the input for all the clusters
-    for (std::size_t cluster=0; cluster<_weights.size(); ++cluster) {
-        float cluster_value = _weights[cluster];
-        float penalty = std::abs(value - cluster_value) / std::max(value, cluster_value);
-
+    for (std::size_t cluster=0; cluster<numberOfClusters(); ++cluster) {
         out[cluster] = probabilityOfInput(cluster, input) * _probabilities[cluster];
     }
 }
@@ -133,10 +135,10 @@ void GaussianMixture::probabilitiesOfClusters(float *out, const Eigen::VectorXf 
 void GaussianMixture::probabilitiesOfClusters(float *out, float *input_probabilities) const
 {
     // Compute, for each cluster, p(input|cluster)*p(cluster) / sum(probabilities)
-    float proba_x = std::accumulate(input_probabilities, input_probabilities + _weights.size(), 0.0f);
+    float proba_x = std::accumulate(input_probabilities, input_probabilities + numberOfClusters(), 0.0f);
     float inv_proba_x = 1 / proba_x;
 
-    for (std::size_t cluster=0; cluster<_weights.size(); ++cluster) {
+    for (std::size_t cluster=0; cluster<numberOfClusters(); ++cluster) {
         out[cluster] = input_probabilities[cluster] * inv_proba_x;
     }
 }

@@ -3,6 +3,7 @@
 #include <learning/softmaxlearning.h>
 #include <learning/egreedylearning.h>
 #include <model/tablemodel.h>
+#include <model/gaussianmixturemodel.h>
 #include <world/gridworld.h>
 
 #include <string>
@@ -34,6 +35,8 @@ int main(int argc, char **argv) {
             world = new GridWorld(10, 5, initial, obstacle, goal, arg == "stochasticgridworld");
         } else if (arg == "table") {
             model = new TableModel;
+        } else if (arg == "gaussian") {
+            model = new GaussianMixtureModel(0.60, 0.20, 0.05);       // Tailored for the gridworld
         } else if (arg == "qlearning") {
             learning = new QLearning(0.9, 0.3);
         } else if (arg == "advantage") {

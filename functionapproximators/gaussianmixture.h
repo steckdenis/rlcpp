@@ -27,6 +27,11 @@ class GaussianMixture
          */
         float value(const Eigen::VectorXf &input) const;
 
+        /**
+         * @brief Number of clusters in the model (for statistics)
+         */
+        unsigned int numberOfClusters() const;
+
     private:
         /**
          * @brief Compute p(input|cluster)

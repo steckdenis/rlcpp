@@ -10,6 +10,7 @@ set(SOURCES
     functionapproximators/gaussianmixture.cpp
     model/episode.cpp
     model/tablemodel.cpp
+    model/gaussianmixturemodel.cpp
     learning/qlearning.cpp
     learning/advantagelearning.cpp
     learning/softmaxlearning.cpp
