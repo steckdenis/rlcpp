@@ -53,7 +53,7 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
             float acc = 0.0f;
             unsigned int action;
 
-            for (action = 0; action < episode->valueSize(); ++action) {
+            for (action = 0; action < episode->valueSize() - 1; ++action) {
                 acc += values[action];
 
                 if (acc > rnd) {
