@@ -41,8 +41,8 @@ void NnetModel::learn(const std::vector<Episode *> &episodes)
 {
     std::vector<float> state;
     std::vector<float> values;
-    Eigen::MatrixXf matrix_state;
-    Eigen::MatrixXf matrix_values;
+    ocropus::Sequence inputs(1);
+    ocropus::Sequence outputs(1);
 
     for (Episode *episode : episodes) {
         Eigen::VectorXf input(episode->stateSize());
@@ -56,24 +56,20 @@ void NnetModel::learn(const std::vector<Episode *> &episodes)
         }
 
         // Make a sequence of observations and values
-        ocropus::Sequence inputs;
-        ocropus::Sequence outputs;
-
         for (unsigned int t=0; t < episode->length() - 1; ++t) {
             unsigned int action = episode->action(t);
 
             episode->state(t, state);
             episode->values(t, values);
 
-            vectorToBatch(state, matrix_state);
-            vectorToBatch(values, matrix_values);
+            vectorToBatch(state, inputs[0]);
+            vectorToBatch(values, outputs[0]);
 
-            inputs.push_back(matrix_state);
-            outputs.push_back(matrix_values);
+            // Perform 5 gradient steps
+            for (int i=0; i<5; ++i) {
+                ocropus::train(_network.get(), inputs, outputs);
+            }
         }
-
-        // Train the network
-        ocropus::train(_network.get(), inputs, outputs);
     }
 }
 
