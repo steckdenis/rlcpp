@@ -19,6 +19,7 @@ class NnetModel : public AbstractModel
 
     private:
         void vectorToVector(const std::vector<float> &stl, Vector &eigen);
+        void vectorToCol(const std::vector<float> &stl, Matrix &matrix, int col);
 
     private:
         unsigned int _hidden_neurons;

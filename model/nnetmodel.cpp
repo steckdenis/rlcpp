@@ -46,17 +46,27 @@ void NnetModel::learn(const std::vector<Episode *> &episodes)
     std::vector<float> state;
     std::vector<float> values;
 
-    for (Episode *episode : episodes) {
-        Vector input(episode->stateSize());
-        Vector output(episode->stateSize());
+    // Create a big matrix with one column per input/output pair
+    std::size_t total_size = 0;
 
+    for (Episode *episode : episodes) {
+        total_size += episode->length() - 1;
+    }
+
+    Eigen::MatrixXf inputs(episodes[0]->stateSize(), total_size);
+    Eigen::MatrixXf outputs(episodes[0]->valueSize(), total_size);
+
+    // Fill this matrix
+    int index = 0;
+
+    for (Episode *episode : episodes) {
         // Create the network if needed
         if (!_network) {
             _network = new Network(episode->stateSize());
 
-            Dense *dense1 = new Dense(_hidden_neurons, 0.05);
+            Dense *dense1 = new Dense(_hidden_neurons, 1e-4);
             TanhActivation *dense1_act = new TanhActivation;
-            Dense *dense2 = new Dense(episode->valueSize(), 0.05);
+            Dense *dense2 = new Dense(episode->valueSize(), 1e-4);
 
             dense1->setInput(_network->inputPort());
             dense1_act->setInput(dense1->output());
@@ -74,15 +84,15 @@ void NnetModel::learn(const std::vector<Episode *> &episodes)
             episode->state(t, state);
             episode->values(t, values);
 
-            vectorToVector(state, input);
-            vectorToVector(values, output);
+            vectorToCol(state, inputs, index);
+            vectorToCol(values, outputs, index);
 
-            // Perform 5 gradient steps
-            for (int i=0; i<5; ++i) {
-                _network->trainSample(input, output);
-            }
+            ++index;
         }
     }
+
+    // Train the network on that data
+    _network->train(inputs, outputs, 1, 100, true);
 }
 
 void NnetModel::vectorToVector(const std::vector<float> &stl, Vector &eigen)
@@ -94,3 +104,9 @@ void NnetModel::vectorToVector(const std::vector<float> &stl, Vector &eigen)
     }
 }
 
+void NnetModel::vectorToCol(const std::vector<float> &stl, Matrix &matrix, int col)
+{
+    for (std::size_t i=0; i<stl.size(); ++i) {
+        matrix(i, col) = stl[i];
+    }
+}
