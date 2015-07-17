@@ -1,19 +1,19 @@
-#include <learning/qlearning.h>
-#include <learning/advantagelearning.h>
-#include <learning/softmaxlearning.h>
-#include <learning/egreedylearning.h>
-#include <model/tablemodel.h>
-#include <model/gaussianmixturemodel.h>
-#include <model/nnetmodel.h>
-#include <world/gridworld.h>
-#include <world/oneofnworld.h>
+#include "learning/qlearning.h"
+#include "learning/advantagelearning.h"
+#include "learning/softmaxlearning.h"
+#include "learning/egreedylearning.h"
+#include "model/tablemodel.h"
+#include "model/gaussianmixturemodel.h"
+#include "model/nnetmodel.h"
+#include "world/gridworld.h"
+#include "world/oneofnworld.h"
 
 #include <string>
 #include <fstream>
 #include <iostream>
 
 static const unsigned int num_episodes = 1000;
-static const unsigned int max_timesteps = 5000;
+static const unsigned int max_timesteps = 500;
 static const unsigned int batch_size = 10;
 
 int main(int argc, char **argv) {
@@ -45,6 +45,8 @@ int main(int argc, char **argv) {
             model = new TableModel;
         } else if (arg == "gaussian") {
             model = new GaussianMixtureModel(0.60, 0.20, 0.05);       // Tailored for the gridworld
+        } else if (arg == "nnet") {
+            model = new NnetModel(100);
         } else if (arg == "perceptron") {
             model = new NnetModel(200);
         } else if (arg == "qlearning") {

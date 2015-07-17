@@ -8,7 +8,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${EIGEN3_INCLUDE_DIRS})
 
 set(SOURCES
     functionapproximators/gaussianmixture.cpp
-    functionapproximators/clstm.cpp
     model/episode.cpp
     model/tablemodel.cpp
     model/gaussianmixturemodel.cpp
@@ -24,3 +23,4 @@ set(SOURCES
 )
 
 add_executable(rlcpp ${SOURCES})
+target_link_libraries(rlcpp nnetcpp)
