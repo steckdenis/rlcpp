@@ -1,12 +1,8 @@
 #include "nnetmodel.h"
 #include "episode.h"
 
-#include <nnetcpp/dense.h>
-#include <nnetcpp/activation.h>
-
-NnetModel::NnetModel(unsigned int hidden_neurons)
-: _hidden_neurons(hidden_neurons),
-  _network(nullptr)
+NnetModel::NnetModel()
+: _network(nullptr)
 {
 }
 
@@ -63,19 +59,7 @@ void NnetModel::learn(const std::vector<Episode *> &episodes)
     for (Episode *episode : episodes) {
         // Create the network if needed
         if (!_network) {
-            _network = new Network(episode->stateSize());
-
-            Dense *dense1 = new Dense(_hidden_neurons, 1e-4);
-            TanhActivation *dense1_act = new TanhActivation;
-            Dense *dense2 = new Dense(episode->valueSize(), 1e-4);
-
-            dense1->setInput(_network->inputPort());
-            dense1_act->setInput(dense1->output());
-            dense2->setInput(dense1_act->output());
-
-            _network->addNode(dense1);
-            _network->addNode(dense1_act);
-            _network->addNode(dense2);
+            _network = createNetwork(episode);
         }
 
         // Learn all the values obtained during the episode

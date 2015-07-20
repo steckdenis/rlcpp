@@ -12,6 +12,7 @@ set(SOURCES
     model/tablemodel.cpp
     model/gaussianmixturemodel.cpp
     model/nnetmodel.cpp
+    model/perceptronmodel.cpp
     learning/qlearning.cpp
     learning/advantagelearning.cpp
     learning/softmaxlearning.cpp
