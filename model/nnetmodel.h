@@ -28,9 +28,8 @@ class NnetModel : public AbstractModel
          */
         virtual Network *createNetwork(Episode *first_episode) const = 0;
 
-    private:
-        void vectorToVector(const std::vector<float> &stl, Vector &eigen);
-        void vectorToCol(const std::vector<float> &stl, Matrix &matrix, int col);
+        static void vectorToVector(const std::vector<float> &stl, Vector &eigen);
+        static void vectorToCol(const std::vector<float> &stl, Matrix &matrix, int col);
 
     private:
         Network *_network;

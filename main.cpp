@@ -5,6 +5,7 @@
 #include "model/tablemodel.h"
 #include "model/gaussianmixturemodel.h"
 #include "model/perceptronmodel.h"
+#include "model/stackedgrumodel.h"
 #include "world/gridworld.h"
 #include "world/oneofnworld.h"
 
@@ -47,6 +48,8 @@ int main(int argc, char **argv) {
             model = new GaussianMixtureModel(0.60, 0.20, 0.05);       // Tailored for the gridworld
         } else if (arg == "perceptron") {
             model = new PerceptronModel(200);
+        } else if (arg == "stackedgru") {
+            model = new StackedGRUModel(100);
         } else if (arg == "qlearning") {
             learning = new QLearning(0.9, 0.3);
         } else if (arg == "advantage") {
