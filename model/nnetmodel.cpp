@@ -55,6 +55,7 @@ void NnetModel::learn(const std::vector<Episode *> &episodes)
 
     Eigen::MatrixXf inputs(episodes[0]->stateSize(), total_size);
     Eigen::MatrixXf outputs(episodes[0]->valueSize(), total_size);
+    Eigen::MatrixXf weights(episodes[0]->valueSize(), total_size);
 
     // Fill this matrix
     int index = 0;
@@ -87,12 +88,17 @@ void NnetModel::learn(const std::vector<Episode *> &episodes)
             vectorToCol(state, inputs, index);
             vectorToCol(values, outputs, index);
 
+            // Use only the value associated with the action that has been taken
+            // when computing the errors
+            weights.col(index).setZero();
+            weights(action, index) = 1.0f;
+
             ++index;
         }
     }
 
     // Train the network on that data
-    _network->train(inputs, outputs, 1, 100, true);
+    _network->train(inputs, outputs, weights, 1, 100, true);
 }
 
 void NnetModel::vectorToVector(const std::vector<float> &stl, Vector &eigen)
