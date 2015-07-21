@@ -1,13 +1,11 @@
 #include "oneofnworld.h"
 
 #include <cmath>
-#include <iostream>
 
 OneOfNWorld::OneOfNWorld(AbstractWorld *world,
                          const std::vector<int> &minimums,
                          const std::vector<int> &maximums)
-: AbstractWorld(world->numActions()),
-  _world(world),
+: PostProcessWorld(world),
   _minimums(minimums),
   _maximums(maximums)
 {
@@ -17,32 +15,6 @@ OneOfNWorld::OneOfNWorld(AbstractWorld *world,
     for (std::size_t i=0; i<minimums.size(); ++i) {
         _postprocessed_state_size += 1 + maximums[i] - minimums[i];
     }
-}
-
-OneOfNWorld::~OneOfNWorld()
-{
-    delete _world;
-}
-
-void OneOfNWorld::initialState(std::vector <float> &state)
-{
-    _world->initialState(state);
-    processState(state);
-}
-
-void OneOfNWorld::reset()
-{
-    _world->reset();
-}
-
-void OneOfNWorld::step(unsigned int action,
-                       bool &finished,
-                       float &reward,
-                       std::vector<float> &state)
-{
-    // Let the wrapped world compute the step, then post-process it
-    _world->step(action, finished, reward, state);
-    processState(state);
 }
 
 void OneOfNWorld::processState(std::vector<float> &state)

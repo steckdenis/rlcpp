@@ -9,6 +9,7 @@
 #include "model/parallelgrumodel.h"
 #include "world/gridworld.h"
 #include "world/oneofnworld.h"
+#include "world/scaleworld.h"
 
 #include <string>
 #include <fstream>
@@ -37,6 +38,11 @@ int main(int argc, char **argv) {
             goal.y = 2;
 
             world = new GridWorld(10, 5, initial, obstacle, goal, arg == "stochasticgridworld");
+        } else if (arg == "pomdp") {
+            if (world == nullptr) {
+                std::cerr << "Put pomdp after the world to be wrapped" << std::endl;
+            }
+            world = new ScaleWorld(world, {1.0f, 0.0f});
         } else if (arg == "oneofn") {
             if (world == nullptr) {
                 std::cerr << "Put oneofn after the world to be wrapped" << std::endl;

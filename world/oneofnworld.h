@@ -1,13 +1,13 @@
 #ifndef __ONEOFNWORLD_H__
 #define __ONEOFNWORLD_H__
 
-#include "abstractworld.h"
+#include "postprocessworld.h"
 
 /**
  * @brief World that wraps another ones and encodes its (discrete) states using
  *        a one-hot notation.
  */
-class OneOfNWorld : public AbstractWorld
+class OneOfNWorld : public PostProcessWorld
 {
     public:
         /**
@@ -18,23 +18,14 @@ class OneOfNWorld : public AbstractWorld
         OneOfNWorld(AbstractWorld *world,
                     const std::vector<int> &minimums,
                     const std::vector<int> &maximums);
-        virtual ~OneOfNWorld();
 
-        virtual void initialState(std::vector<float> &state);
-        virtual void reset();
-        virtual void step(unsigned int action,
-                          bool &finished,
-                          float &reward,
-                          std::vector<float> &state);
-
-    private:
+    protected:
         /**
          * @brief Postprocess a state so that it is encoded in a one-host form
          */
-        void processState(std::vector<float> &state);
+        virtual void processState(std::vector<float> &state) override;
 
     private:
-        AbstractWorld *_world;
         std::vector<int> _minimums;
         std::vector<int> _maximums;
 

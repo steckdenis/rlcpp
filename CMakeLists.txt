@@ -22,7 +22,9 @@ set(SOURCES
     learning/egreedylearning.cpp
     world/abstractworld.cpp
     world/gridworld.cpp
+    world/postprocessworld.cpp
     world/oneofnworld.cpp
+    world/scaleworld.cpp
     main.cpp
 )
 
