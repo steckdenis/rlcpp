@@ -3,6 +3,7 @@ add_definitions(-std=c++11)
 
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(EIGEN3 eigen3 REQUIRED)
+pkg_check_modules(ROSCPP roscpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${EIGEN3_INCLUDE_DIRS})
 
@@ -28,5 +29,13 @@ set(SOURCES
     main.cpp
 )
 
+if (ROSCPP_FOUND)
+    set(SOURCES ${SOURCES} world/rosworld.cpp)
+    add_definitions(-DROSCPP_FOUND)
+endif(ROSCPP_FOUND)
+
 add_executable(rlcpp ${SOURCES})
-target_link_libraries(rlcpp nnetcpp)
+target_link_libraries(rlcpp
+    nnetcpp
+    ${ROSCPP_LDFLAGS}
+)

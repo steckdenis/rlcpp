@@ -106,8 +106,12 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
         std::cout << "[Episode " << e << "] " << episode->cumulativeReward() << std::endl;
 
         if (learn_episodes.size() == batch_size) {
+            std::cout << "Learning..." << std::flush;
+
             model->learn(learn_episodes);
             learn_episodes.clear();
+
+            std::cout << "done" << std::endl;
         }
     }
 

@@ -33,15 +33,27 @@
 #include "world/oneofnworld.h"
 #include "world/scaleworld.h"
 
+#ifdef ROSCPP_FOUND
+    #include "world/rosworld.h"
+
+    #include <std_msgs/Float32.h>
+    #include <std_msgs/Float64.h>
+#endif
+
 #include <string>
 #include <fstream>
 #include <iostream>
 
-static const unsigned int num_episodes = 1000;
-static const unsigned int max_timesteps = 1000;
-static const unsigned int batch_size = 10;
+unsigned int num_episodes = 1000;
+unsigned int max_timesteps = 1000;
+unsigned int batch_size = 10;
 
 int main(int argc, char **argv) {
+#ifdef ROSCPP_FOUND
+    // Initialize ROS
+    ros::init(argc, argv, "rlcpp", ros::init_options::AnonymousName | ros::init_options::NoSigintHandler);
+#endif
+
     AbstractWorld *world = nullptr;
     AbstractModel *model = nullptr;
     AbstractLearning *learning = nullptr;
@@ -71,6 +83,18 @@ int main(int argc, char **argv) {
                 return 1;
             }
             world = new OneOfNWorld(world, {0, 0}, {9, 4});
+#ifdef ROSCPP_FOUND
+        } else if (arg == "rospendulum") {
+            batch_size = 1;
+
+            world = new RosWorld({
+                new RosWorld::DefaultParser<std_msgs::Float32>("vrep", "jointAngle"),
+                new RosWorld::DefaultParser<std_msgs::Float32>("vrep", "jointVelocity"),
+                new RosWorld::DefaultParser<std_msgs::Float32>("vrep", "reward")
+            }, {
+                new RosWorld::DefaultProducer<std_msgs::Float64>("vrep", "jointTorque", {-10.0, 0.0, 10.0})
+            });
+#endif
         } else if (arg == "table") {
             model = new TableModel;
         } else if (arg == "gaussian") {
