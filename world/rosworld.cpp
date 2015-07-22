@@ -16,7 +16,7 @@ static unsigned int possibleActions(const std::vector<RosWorld::Producer *> &pub
         rs += producer->values.size();
     }
 
-    return rs;
+    return rs - 1;  // The last action is used to reset the world
 }
 
 RosWorld::RosWorld(const std::vector<RosWorld::Parser *> &subscriptions,
@@ -67,7 +67,10 @@ void RosWorld::initialState(std::vector<float> &state)
 
 void RosWorld::reset()
 {
-    // Do nothing
+    // Publish the last value of the last producer
+    Producer *p = _publications.back();
+
+    p->publishValue(p->values.back());
 }
 
 void RosWorld::step(unsigned int action, bool &finished, float &reward, std::vector<float> &state)

@@ -41,6 +41,7 @@
 
     #include <std_msgs/Float32.h>
     #include <std_msgs/Float64.h>
+    #include <std_msgs/Int32.h>
 #endif
 
 #include <string>
@@ -148,7 +149,8 @@ int main(int argc, char **argv) {
                 new RosWorld::DefaultParser<std_msgs::Float32>("vrep", "jointVelocity"),
                 new RosWorld::DefaultParser<std_msgs::Float32>("vrep", "reward")
             }, {
-                new RosWorld::DefaultProducer<std_msgs::Float64>("vrep", "jointTorque", {-10.0, 0.0, 10.0})
+                new RosWorld::DefaultProducer<std_msgs::Float64>("vrep", "jointTorque", {-2.0, 0.0, 2.0}),
+                new RosWorld::DefaultProducer<std_msgs::Int32>("vrep", "reset", {1.0})
             });
 #endif
         } else if (arg == "table") {

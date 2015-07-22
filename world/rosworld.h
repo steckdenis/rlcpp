@@ -120,7 +120,10 @@ class RosWorld : public AbstractWorld
          *                      the state observations. The last subscription
          *                      will be used as a reward signal.
          * @param publications List of producers that will be used to map actions
-         *                     to values published on ROS topics.
+         *                     to values published on ROS topics. The last action
+         *                     (the last value of the last publication) will only
+         *                     be taken at the end of an episode, and can be used
+         *                     to reset a simulation.
          */
         RosWorld(const std::vector<Parser *> &subscriptions,
                  const std::vector<Producer *> &publications);
