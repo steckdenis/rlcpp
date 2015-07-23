@@ -29,6 +29,7 @@
 #include "model/perceptronmodel.h"
 #include "model/stackedgrumodel.h"
 #include "model/parallelgrumodel.h"
+#include "model/stackedlstmmodel.h"
 #include "world/gridworld.h"
 #include "world/oneofnworld.h"
 #include "world/scaleworld.h"
@@ -105,6 +106,8 @@ int main(int argc, char **argv) {
             model = new StackedGRUModel(100);
         } else if (arg == "parallelgru") {
             model = new ParallelGRUModel(100);
+        } else if (arg == "stackedlstm") {
+            model = new StackedLSTMModel(100);
         } else if (arg == "qlearning") {
             learning = new QLearning(0.9, 0.3);
         } else if (arg == "advantage") {
