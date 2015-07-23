@@ -71,7 +71,7 @@ class AbstractWorld
          * @brief Produce a file of any format that represents the contents of
          *        the given model mapped to this world.
          */
-        virtual void plotModel(AbstractModel *model) {}
+        virtual void plotModel(AbstractModel *model);
 
         /**
          * @brief Run an agent in the world for a given number of episodes
@@ -89,8 +89,18 @@ class AbstractWorld
                                    unsigned int num_episodes,
                                    unsigned int max_episode_length,
                                    unsigned int batch_size);
+
+    private:
+        /**
+         * @brief Update _min_state and _max_state so that they contain the minimum
+         *        and maximum ranges of the state variables.
+         */
+        void updateMinMax(const std::vector<float> &state);
+
     private:
         unsigned int _num_actions;
+        std::vector<float> _min_state;
+        std::vector<float> _max_state;
 };
 
 #endif

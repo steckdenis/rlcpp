@@ -1,0 +1,1 @@
+plot "rewards.dat" using 1:2 title "Reward"

@@ -1,0 +1,1 @@
+plot "model_0.dat" using 1:2:3 with image

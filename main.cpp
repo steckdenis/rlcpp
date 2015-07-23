@@ -143,6 +143,9 @@ int main(int argc, char **argv) {
         delete episodes[e];
     }
 
+    // Plot the model
+    world->plotModel(model);
+
     delete model;
     delete learning;
     delete world;
