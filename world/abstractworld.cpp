@@ -31,9 +31,37 @@
 #include <algorithm>
 #include <cstdlib>
 
+#include <signal.h>
+#include <string.h>
+
+/**
+ * @brief Used to identify when to abort AbstractWorld::run
+ */
+static sig_atomic_t abort_run = 0;
+
+/**
+ * @brief Called on SIGTERM, abort AbstractWorld::run
+ */
+static void sigterm_handler(int)
+{
+    abort_run = 1;
+}
+
 AbstractWorld::AbstractWorld(unsigned int num_actions)
 : _num_actions(num_actions)
 {
+    static bool sig_setup = false;
+
+    if (!sig_setup) {
+        // Add a handler for SIGTERM
+        struct sigaction action;
+
+        memset(&action, 0, sizeof(struct sigaction));
+        action.sa_handler = sigterm_handler;
+
+        sigaction(SIGINT, &action, nullptr);
+        sig_setup = true;
+    }
 }
 
 unsigned int AbstractWorld::numActions() const
@@ -52,7 +80,10 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
     std::vector<float> state;
     std::vector<float> values;
 
-    for (unsigned int e=0; e<num_episodes; ++e) {
+    // No abortion of the run, currently
+    abort_run = 0;
+
+    for (unsigned int e=0; e<num_episodes && !abort_run; ++e) {
         Episode *episode = new Episode(_num_actions);
 
         // Initial state
@@ -70,7 +101,7 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
         bool finished = false;
         float reward;
 
-        while (steps < max_episode_length && !finished) {
+        while (steps < max_episode_length && !finished && !abort_run) {
             learning->actions(episode, values);
 
             // Choose an action according to the probabilities
