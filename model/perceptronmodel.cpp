@@ -35,9 +35,9 @@ Network *PerceptronModel::createNetwork(Episode *first_episode) const
 {
     Network *network = new Network(first_episode->stateSize());
 
-    Dense *dense1 = new Dense(_hidden_neurons, 1e-4);
+    Dense *dense1 = new Dense(_hidden_neurons, 1e-2);
     TanhActivation *dense1_act = new TanhActivation;
-    Dense *dense2 = new Dense(first_episode->valueSize(), 1e-4);
+    Dense *dense2 = new Dense(first_episode->valueSize(), 1e-2);
 
     dense1->setInput(network->inputPort());
     dense1_act->setInput(dense1->output());

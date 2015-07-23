@@ -104,7 +104,7 @@ void NnetModel::learn(const std::vector<Episode *> &episodes)
     }
 
     // Train the network on that data
-    _network->train(inputs, outputs, weights, 1, 100, true);
+    _network->train(inputs, outputs, weights, 1, 10, true);
 }
 
 void NnetModel::vectorToVector(const std::vector<float> &stl, Vector &eigen)

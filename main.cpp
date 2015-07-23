@@ -45,7 +45,7 @@
 #include <fstream>
 #include <iostream>
 
-unsigned int num_episodes = 1000;
+unsigned int num_episodes = 5000;
 unsigned int max_timesteps = 1000;
 unsigned int batch_size = 10;
 
