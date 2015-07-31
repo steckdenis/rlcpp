@@ -7,10 +7,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,38 +20,32 @@
  * THE SOFTWARE.
  */
 
-#ifndef __GRIDWORLD_H__
-#define __GRIDWORLD_H__
+#ifndef __POLARGRIDWORLD_H__
+#define __POLARGRIDWORLD_H__
 
-#include "abstractworld.h"
+#include "gridworld.h"
 
 /**
- * @brief Gridworld in which there is an obstacle and a goal
+ * @brief Same as GridWorld, except that the agent can only sense its orientation
+ *        and the distance between it and the wall in front of it.
  */
-class GridWorld : public AbstractWorld
+class PolarGridWorld : public GridWorld
 {
     public:
-        struct Point {
-            int x;
-            int y;
-        };
-
         enum class Action {
-            Up,
-            Right,
-            Down,
-            Left
+            Forward,
+            Backward,
+            TurnLeft,
+            TurnRight
         };
 
-        GridWorld(unsigned int width,
-                  unsigned int height,
-                  Point initial,
-                  Point obstacle,
-                  Point goal,
-                  bool stochastic);
+        PolarGridWorld(unsigned int width,
+                       unsigned int height,
+                       Point initial,
+                       Point obstacle,
+                       Point goal,
+                       bool stochastic);
 
-        virtual void initialState(std::vector<float> &state);
-        virtual void reset();
         virtual void step(unsigned int action,
                           bool &finished,
                           float &reward,
@@ -59,19 +53,12 @@ class GridWorld : public AbstractWorld
 
     private:
         /**
-         * @brief Encode the current position into a 2-variables (x, y) state
+         * @brief Encode the current position into a 2-variables (rho, sigma) state
          */
         virtual void encodeState(const Point &point, std::vector<float> &state);
 
-    protected:
-        unsigned int _width;
-        unsigned int _height;
-        Point _initial;
-        Point _obstacle;
-        Point _goal;
-        Point _current_pos;
-
-        bool _stochastic;
+    private:
+        unsigned int _direction;
 };
 
 #endif

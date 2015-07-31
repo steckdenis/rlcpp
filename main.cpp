@@ -31,6 +31,7 @@
 #include "model/parallelgrumodel.h"
 #include "model/stackedlstmmodel.h"
 #include "world/gridworld.h"
+#include "world/polargridworld.h"
 #include "world/oneofnworld.h"
 #include "world/scaleworld.h"
 
@@ -58,11 +59,14 @@ int main(int argc, char **argv) {
     AbstractWorld *world = nullptr;
     AbstractModel *model = nullptr;
     AbstractLearning *learning = nullptr;
+    bool random_initial = false;
 
     for (int i=1; i<argc; ++i) {
         std::string arg(argv[i]);
 
-        if (arg == "gridworld" || arg == "stochasticgridworld") {
+        if (arg == "randominitial") {
+            random_initial = true;
+        } else if (arg == "gridworld" || arg == "polargridworld") {
             GridWorld::Point initial, obstacle, goal;
 
             initial.x = 0;
@@ -72,10 +76,15 @@ int main(int argc, char **argv) {
             goal.x = 9;
             goal.y = 2;
 
-            world = new GridWorld(10, 5, initial, obstacle, goal, arg == "stochasticgridworld");
+            if (arg == "gridworld") {
+                world = new GridWorld(10, 5, initial, obstacle, goal, random_initial);
+            } else if (arg == "polargridworld") {
+                world = new PolarGridWorld(10, 5, initial, obstacle, goal, random_initial);
+            }
         } else if (arg == "pomdp") {
             if (world == nullptr) {
                 std::cerr << "Put pomdp after the world to be wrapped" << std::endl;
+                return 1;
             }
             world = new ScaleWorld(world, {1.0f, 0.0f});
         } else if (arg == "oneofn") {

@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 2.6)
+
 project(rlcpp)
 add_definitions(-std=c++11)
 
@@ -24,6 +26,7 @@ set(SOURCES
     learning/egreedylearning.cpp
     world/abstractworld.cpp
     world/gridworld.cpp
+    world/polargridworld.cpp
     world/postprocessworld.cpp
     world/oneofnworld.cpp
     world/scaleworld.cpp

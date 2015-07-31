@@ -60,6 +60,7 @@ AbstractWorld::AbstractWorld(unsigned int num_actions)
         action.sa_handler = sigterm_handler;
 
         sigaction(SIGINT, &action, nullptr);
+        sigaction(SIGTERM, &action, nullptr);
         sig_setup = true;
     }
 }
@@ -161,7 +162,7 @@ void AbstractWorld::plotModel(AbstractModel *model)
     }
 
     // Define some variables that allow to handle 1D and 2D worlds in a generic way
-    bool onedimension = _min_state.size() == 1;
+    bool onedimension = (_min_state.size() == 1 || _min_state[1] == _max_state[1]);
     float min_x = _min_state[0];
     float max_x = _max_state[0];
     float dx = (max_x - min_x) * 0.01f;

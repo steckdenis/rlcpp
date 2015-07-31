@@ -34,7 +34,7 @@ StackedGRUModel::StackedGRUModel(unsigned int hidden_neurons)
 
 Network *StackedGRUModel::createNetwork(Episode *first_episode) const
 {
-    static const float learning_rate = 1e-3;
+    static const float learning_rate = 1e-2;
 
     Network *net = new Network(first_episode->stateSize());
     Dense *dense_in = new Dense(_hidden_neurons, learning_rate);

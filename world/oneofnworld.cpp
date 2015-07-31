@@ -23,6 +23,7 @@
 #include "oneofnworld.h"
 
 #include <cmath>
+#include <assert.h>
 
 OneOfNWorld::OneOfNWorld(AbstractWorld *world,
                          const std::vector<int> &minimums,
@@ -41,14 +42,14 @@ OneOfNWorld::OneOfNWorld(AbstractWorld *world,
 
 void OneOfNWorld::processState(std::vector<float> &state)
 {
+    assert(state.size() == _minimums.size());
+
     // Resize state to its new size, that will be bigger than the original size
     // because one-hot expands the state space
-    int original_size = state.size();
-
     state.resize(_postprocessed_state_size);
 
     // Adjust the state
-    int index = original_size - 1;
+    int index = _minimums.size() - 1;
     int offset = _postprocessed_state_size;
 
     for (; index >= 0; --index) {

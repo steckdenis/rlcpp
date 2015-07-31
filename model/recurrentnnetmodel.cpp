@@ -74,22 +74,22 @@ void RecurrentNnetModel::learn(const std::vector<Episode *> &episodes)
     std::vector<float> values;
     Vector input;
     Vector output;
-    Vector weights;
 
     // Learn all the episodes separately, because they represent sequences
     // of observations that must be kept in order
-    for (int i=0; i<10; ++i) {
-        for (Episode *episode : episodes) {
-            // Create the network if needed
-            if (!_network) {
-                _network = createNetwork(episode);
-            }
+    for (Episode *episode : episodes) {
+        // Create the network if needed
+        if (!_network) {
+            _network = createNetwork(episode);
+        }
 
-            // Learn all the values obtained during the episode
-            weights.resize(episode->valueSize());
-            weights.setZero();
+        // Learn all the values obtained during the episode
+        unsigned int start_t = std::max(0U, episode->length() - 100);
 
-            for (unsigned int t=0; t < episode->length() - 1; ++t) {
+        for (int i=0; i<4; ++i) {
+            _network->reset();
+
+            for (unsigned int t=start_t; t < episode->length() - 1; ++t) {
                 unsigned int action = episode->action(t);
 
                 episode->state(t, state);
@@ -100,11 +100,7 @@ void RecurrentNnetModel::learn(const std::vector<Episode *> &episodes)
 
                 // Use only the value associated with the action that has been taken
                 // when computing the errors
-                weights(action) = 1.0f;
-
-                _network->trainSample(input, output, weights);
-
-                weights(action) = 0.0f;
+                _network->trainSample(input, output);
             }
         }
     }
