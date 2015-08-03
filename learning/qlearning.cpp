@@ -54,5 +54,6 @@ void QLearning::actions(Episode *episode, std::vector<float> &probabilities, flo
     }
 
     // probabilities (alias current_values) contains the values of the last state
-    // in the episode.
+    // in the episode. Truncate it to the number of actions.
+    probabilities.resize(episode->numActions());
 }

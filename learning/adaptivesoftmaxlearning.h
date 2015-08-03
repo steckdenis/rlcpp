@@ -19,37 +19,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+#ifndef __ADAPTIVESOFTMAXLEARNING_H__
+#define __ADAPTIVESOFTMAXLEARNING_H__
 
-#ifndef __SOFTMAXLEARNING_H__
-#define __SOFTMAXLEARNING_H__
+#include "softmaxlearning.h"
 
-#include "abstractlearning.h"
+class Network;
 
 /**
- * @brief Wrapper for a learning algorithm that implements the Softmax action selection
+ * @brief Softmax that adjusts its temperature depending on the TD-error usually
+ *        received at the current state.
  */
-class SoftmaxLearning : public AbstractLearning
+class AdaptiveSoftmaxLearning : public SoftmaxLearning
 {
     public:
         /**
          * @param learning Learning algorithm that is wrapped by this Softmax
-         * @param temperature The higher this is, the more exploration there is
+         * @param discount_factor Discount factor applied to future TD errors
          */
-        SoftmaxLearning(AbstractLearning *learning, float temperature);
-        virtual ~SoftmaxLearning();
+        AdaptiveSoftmaxLearning(AbstractLearning *learning,
+                                float discount_factor);
 
-        virtual void actions(Episode *episode, std::vector<float> &probabilities, float &td_error);
-
-    protected:
         /**
          * @brief Let a subclass adjust the temperature of Softmax before an action
          *        is selected.
          */
         virtual float adjustTemperature(Episode *episode, float td_error);
 
+        /**
+         * @brief Require one more value, so that each state-action has information
+         *        about its expected td-error.
+         */
+        virtual unsigned int valueSize(unsigned int num_actions) const;
+
     private:
-        AbstractLearning *_learning;
-        float _temperature;
+        std::vector<float> _values;
+        float _discount_factor;
 };
 
 #endif

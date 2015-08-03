@@ -85,7 +85,7 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
     abort_run = 0;
 
     for (unsigned int e=0; e<num_episodes && !abort_run; ++e) {
-        Episode *episode = new Episode(_num_actions);
+        Episode *episode = new Episode(learning->valueSize(_num_actions), _num_actions);
 
         // Initial state
         reset();
@@ -187,8 +187,8 @@ void AbstractWorld::plotModel(AbstractModel *model)
 
     for (float y = min_y; y < max_y; y += dy) {
         for (float x = min_x; x < max_x; x += dx) {
-            // Make a dummy episode used
-            Episode episode(numActions());
+            // Make a dummy episode
+            Episode episode(numActions(), numActions());
 
             state[0] = x;
 

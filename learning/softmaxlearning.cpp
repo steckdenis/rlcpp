@@ -40,6 +40,7 @@ void SoftmaxLearning::actions(Episode *episode, std::vector<float> &probabilitie
 {
     // Let the wrapped learning algorithm compute the premilinary values
     _learning->actions(episode, probabilities, td_error);
+    _temperature = adjustTemperature(episode, td_error);
 
     // Take the exponentials of all those values
     for (float &v : probabilities) {
@@ -52,4 +53,13 @@ void SoftmaxLearning::actions(Episode *episode, std::vector<float> &probabilitie
     for (float &v : probabilities) {
         v /= sum;
     }
+}
+
+float SoftmaxLearning::adjustTemperature(Episode *episode, float td_error)
+{
+    (void) episode;
+    (void) td_error;
+
+    // By default, use a fixed temperature
+    return _temperature;
 }

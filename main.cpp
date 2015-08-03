@@ -23,6 +23,7 @@
 #include "learning/qlearning.h"
 #include "learning/advantagelearning.h"
 #include "learning/softmaxlearning.h"
+#include "learning/adaptivesoftmaxlearning.h"
 #include "learning/egreedylearning.h"
 #include "model/tablemodel.h"
 #include "model/gaussianmixturemodel.h"
@@ -125,6 +126,13 @@ int main(int argc, char **argv) {
             }
 
             learning = new SoftmaxLearning(learning, 0.5);
+        } else if (arg == "adaptivesoftmax") {
+            if (learning == nullptr) {
+                std::cerr << "Put adaptivesoftmax after the learning algorithm to be filtered" << std::endl;
+                return 1;
+            }
+
+            learning = new AdaptiveSoftmaxLearning(learning, 0.2);
         } else if (arg == "egreedy") {
             if (learning == nullptr) {
                 std::cerr << "Put egreedy after the learning algorithm to be filtered" << std::endl;

@@ -37,7 +37,24 @@ class AbstractLearning
         AbstractLearning() {}
         virtual ~AbstractLearning() {}
 
+        /**
+         * @brief Populate @p probabilities with the probability that each action
+         *        is taken. @p episode can be updated if the learning algorithm
+         *        has to learn new state-action values.
+         */
         virtual void actions(Episode *episode, std::vector<float> &probabilities, float &td_error) = 0;
+
+        /**
+         * @brief Return the number of value elements to be stored in an episode
+         *        given the number of possible actions.
+         *
+         * This allows learning algorithms to store more data in the episode, if
+         * statistics about rewards or td-errors are needed, for instance.
+         */
+        virtual unsigned int valueSize(unsigned int num_actions) const
+        {
+            return num_actions;
+        }
 };
 
 #endif

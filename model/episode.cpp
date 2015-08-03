@@ -7,10 +7,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -52,9 +52,10 @@ static void extract(const std::vector<float> &vector,
     std::copy(vector.begin() + from, vector.begin() + to, rs.begin());
 }
 
-Episode::Episode(unsigned int value_size)
+Episode::Episode(unsigned int value_size, unsigned int num_actions)
 : _state_size(0),
-  _value_size(value_size)
+  _value_size(value_size),
+  _num_actions(num_actions)
 {
 }
 
@@ -89,6 +90,11 @@ unsigned int Episode::stateSize() const
 unsigned int Episode::valueSize() const
 {
     return _value_size;
+}
+
+unsigned int Episode::numActions() const
+{
+    return _num_actions;
 }
 
 unsigned int Episode::length() const
