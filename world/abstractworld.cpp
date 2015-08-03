@@ -7,10 +7,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -101,9 +101,10 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
         unsigned int steps = 0;
         bool finished = false;
         float reward;
+        float td_error;
 
         while (steps < max_episode_length && !finished && !abort_run) {
-            learning->actions(episode, values);
+            learning->actions(episode, values, td_error);
 
             // Choose an action according to the probabilities
             float rnd = float(std::rand() % 65536) / 65536.0f;
@@ -133,7 +134,7 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
         }
 
         // Let the learning update the values of the last state that has been visited
-        learning->actions(episode, values);
+        learning->actions(episode, values, td_error);
 
         // If a batch has been finished, update the model
         episodes.push_back(episode);

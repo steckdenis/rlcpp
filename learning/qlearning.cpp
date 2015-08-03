@@ -7,10 +7,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -31,7 +31,7 @@ QLearning::QLearning(float discount_factor, float learning_rate)
 }
 
 
-void QLearning::actions(Episode *episode, std::vector<float> &probabilities)
+void QLearning::actions(Episode *episode, std::vector<float> &probabilities, float &td_error)
 {
     // Update the Q-value of the last action that was taken
     std::vector<float> &current_values = probabilities;             // Reuse temporary vectors
@@ -45,12 +45,12 @@ void QLearning::actions(Episode *episode, std::vector<float> &probabilities)
         episode->values(last_t + 1, current_values);
 
         float Q = _last_values[last_action];
-        float error =
+        td_error =
             last_reward +
             _discount_factor * *std::max_element(current_values.begin(), current_values.end())
             - Q;
 
-        episode->updateValue(last_t, last_action, Q + _learning_rate * error);
+        episode->updateValue(last_t, last_action, Q + _learning_rate * td_error);
     }
 
     // probabilities (alias current_values) contains the values of the last state

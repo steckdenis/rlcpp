@@ -7,10 +7,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -36,11 +36,10 @@ SoftmaxLearning::~SoftmaxLearning()
     delete _learning;
 }
 
-void SoftmaxLearning::actions(Episode *episode, std::vector<float> &probabilities)
+void SoftmaxLearning::actions(Episode *episode, std::vector<float> &probabilities, float &td_error)
 {
-
     // Let the wrapped learning algorithm compute the premilinary values
-    _learning->actions(episode, probabilities);
+    _learning->actions(episode, probabilities, td_error);
 
     // Take the exponentials of all those values
     for (float &v : probabilities) {
