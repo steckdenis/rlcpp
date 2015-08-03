@@ -7,10 +7,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,7 +28,6 @@
 #include "model/gaussianmixturemodel.h"
 #include "model/perceptronmodel.h"
 #include "model/stackedgrumodel.h"
-#include "model/parallelgrumodel.h"
 #include "model/stackedlstmmodel.h"
 #include "world/gridworld.h"
 #include "world/polargridworld.h"
@@ -113,8 +112,6 @@ int main(int argc, char **argv) {
             model = new PerceptronModel(200);
         } else if (arg == "stackedgru") {
             model = new StackedGRUModel(100);
-        } else if (arg == "parallelgru") {
-            model = new ParallelGRUModel(100);
         } else if (arg == "stackedlstm") {
             model = new StackedLSTMModel(100);
         } else if (arg == "qlearning") {

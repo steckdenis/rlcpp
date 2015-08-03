@@ -18,7 +18,6 @@ set(SOURCES
     model/perceptronmodel.cpp
     model/recurrentnnetmodel.cpp
     model/stackedgrumodel.cpp
-    model/parallelgrumodel.cpp
     model/stackedlstmmodel.cpp
     learning/qlearning.cpp
     learning/advantagelearning.cpp
