@@ -30,6 +30,7 @@
 #include "model/perceptronmodel.h"
 #include "model/stackedgrumodel.h"
 #include "model/stackedlstmmodel.h"
+#include "world/tmazeworld.h"
 #include "world/gridworld.h"
 #include "world/polargridworld.h"
 #include "world/oneofnworld.h"
@@ -66,6 +67,9 @@ int main(int argc, char **argv) {
 
         if (arg == "randominitial") {
             random_initial = true;
+        } else if (arg == "tmaze") {
+            num_episodes = 50000;
+            world = new TMazeWorld(8, 1);
         } else if (arg == "gridworld" || arg == "polargridworld") {
             GridWorld::Point initial, obstacle, goal;
 
@@ -92,7 +96,7 @@ int main(int argc, char **argv) {
                 std::cerr << "Put oneofn after the world to be wrapped" << std::endl;
                 return 1;
             }
-            world = new OneOfNWorld(world, {0, 0}, {9, 4});
+            world = new OneOfNWorld(world, {0, 0}, {9, 4});     // 10x4 range, okay for the gridworlds and for a short tmaze (corridor of length at most 10)
 #ifdef ROSCPP_FOUND
         } else if (arg == "rospendulum") {
             batch_size = 1;

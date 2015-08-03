@@ -25,6 +25,7 @@ set(SOURCES
     learning/adaptivesoftmaxlearning.cpp
     learning/egreedylearning.cpp
     world/abstractworld.cpp
+    world/tmazeworld.cpp
     world/gridworld.cpp
     world/polargridworld.cpp
     world/postprocessworld.cpp
