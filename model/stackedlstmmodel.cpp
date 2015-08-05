@@ -7,10 +7,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -34,7 +34,7 @@ StackedLSTMModel::StackedLSTMModel(unsigned int hidden_neurons)
 
 Network *StackedLSTMModel::createNetwork(Episode *first_episode) const
 {
-    static const float learning_rate = 1e-3;
+    static const float learning_rate = 2e-3;
 
     Network *net = new Network(first_episode->stateSize());
     Dense *dense_in = new Dense(_hidden_neurons, learning_rate);

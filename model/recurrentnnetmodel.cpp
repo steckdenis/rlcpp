@@ -84,9 +84,9 @@ void RecurrentNnetModel::learn(const std::vector<Episode *> &episodes)
         }
 
         // Learn all the values obtained during the episode
-        unsigned int start_t = std::max(0U, episode->length() - 100);
+        unsigned int start_t = 0; // std::max(0U, episode->length() - 100);
 
-        for (int i=0; i<4; ++i) {
+        for (int i=0; i<3; ++i) {
             _network->reset();
 
             for (unsigned int t=start_t; t < episode->length() - 1; ++t) {
