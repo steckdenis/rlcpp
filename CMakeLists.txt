@@ -31,6 +31,8 @@ set(SOURCES
     world/postprocessworld.cpp
     world/oneofnworld.cpp
     world/scaleworld.cpp
+    texplore/modelworld.cpp
+    texplore/texploremodel.cpp
     main.cpp
 )
 

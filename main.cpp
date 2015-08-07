@@ -35,6 +35,7 @@
 #include "world/polargridworld.h"
 #include "world/oneofnworld.h"
 #include "world/scaleworld.h"
+#include "texplore/texploremodel.h"
 
 #ifdef ROSCPP_FOUND
     #include "world/rosworld.h"
@@ -51,6 +52,7 @@ unsigned int num_episodes = 5000;
 unsigned int max_timesteps = 1000;
 unsigned int hidden_neurons = 100;
 unsigned int batch_size = 10;
+unsigned int rollout_length = 50;
 float discount_factor = 0.9f;
 
 int main(int argc, char **argv) {
@@ -62,6 +64,7 @@ int main(int argc, char **argv) {
     AbstractWorld *world = nullptr;
     AbstractModel *model = nullptr;
     AbstractLearning *learning = nullptr;
+    AbstractLearning *base_learning = nullptr;  // Learning without Softmax or EGreedy
     bool random_initial = false;
 
     for (int i=1; i<argc; ++i) {
@@ -125,8 +128,10 @@ int main(int argc, char **argv) {
             model = new StackedLSTMModel(hidden_neurons);
         } else if (arg == "qlearning") {
             learning = new QLearning(discount_factor, 0.3);
+            base_learning = learning;
         } else if (arg == "advantage") {
             learning = new AdvantageLearning(discount_factor, 0.3, 0.5);
+            base_learning = learning;
         } else if (arg == "softmax") {
             if (learning == nullptr) {
                 std::cerr << "Put softmax after the learning algorithm to be filtered" << std::endl;
@@ -148,6 +153,16 @@ int main(int argc, char **argv) {
             }
 
             learning = new EGreedyLearning(learning, 0.2);
+        } else if (arg == "texplore") {
+            batch_size = 1;
+
+            model = new TExploreModel(
+                world,
+                new PerceptronModel(hidden_neurons),
+                model,
+                new SoftmaxLearning(base_learning, 3.0f),   // Great amount of exploration in TEXPLORE rollouts
+                rollout_length
+            );
         }
     }
 

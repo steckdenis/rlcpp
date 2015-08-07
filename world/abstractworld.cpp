@@ -70,11 +70,24 @@ unsigned int AbstractWorld::numActions() const
     return _num_actions;
 }
 
+void AbstractWorld::stepSupervised(unsigned int action, const std::vector<float> &target_state)
+{
+    (void) target_state;
+
+    bool finished;
+    float reward;
+    std::vector<float> state;
+
+    step(action, finished, reward, state);
+}
+
 std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
                                           AbstractLearning *learning,
                                           unsigned int num_episodes,
                                           unsigned int max_episode_length,
-                                          unsigned int batch_size)
+                                          unsigned int batch_size,
+                                          bool verbose,
+                                          Episode *start_episode)
 {
     std::vector<Episode *> episodes;
     std::vector<Episode *> learn_episodes;
@@ -85,13 +98,28 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
     abort_run = 0;
 
     for (unsigned int e=0; e<num_episodes && !abort_run; ++e) {
-        Episode *episode = new Episode(learning->valueSize(_num_actions), _num_actions);
+        Episode *episode;
 
-        // Initial state
-        reset();
-        initialState(state);
-        updateMinMax(state);
-        episode->addState(state);
+        if (!start_episode) {
+            // Start a new empty episode
+            episode = new Episode(learning->valueSize(_num_actions), _num_actions);
+
+            reset();
+            initialState(state);
+            updateMinMax(state);
+
+            episode->addState(state);
+        } else {
+            // Copy the existing episode and replay its action in the world
+            episode = new Episode(*start_episode);
+
+            reset();    // This makes the assumption that the first state of the episode is the initial state of this world.
+
+            for (unsigned int t = 0; t < episode->length() - 1; ++t) {
+                episode->state(t + 1, state);
+                stepSupervised(episode->action(t), state);
+            }
+        }
 
         // Initial value
         model->values(episode, values);
@@ -140,15 +168,15 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
         episodes.push_back(episode);
         learn_episodes.push_back(episode);
 
-        std::cout << "[Episode " << e << "] " << episode->cumulativeReward() << std::endl;
+        if (verbose) std::cout << "[Episode " << e << "] " << episode->cumulativeReward() << std::endl;
 
         if (learn_episodes.size() == batch_size) {
-            std::cout << "Learning..." << std::flush;
+            if (verbose) std::cout << "Learning..." << std::flush;
 
             model->learn(learn_episodes);
             learn_episodes.clear();
 
-            std::cout << "done" << std::endl;
+            if (verbose) std::cout << "done" << std::endl;
         }
     }
 
@@ -199,7 +227,7 @@ void AbstractWorld::plotModel(AbstractModel *model)
             episode.addState(state);
 
             // Query the values from the model
-            model->values(&episode, values);
+            model->valuesForPlotting(&episode, values);
 
             // And print them in the output streams
             for (unsigned int action=0; action<_num_actions; ++action) {

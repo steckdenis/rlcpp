@@ -7,10 +7,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -46,6 +46,17 @@ class AbstractModel
          *        @p episode.
          */
         virtual void values(Episode *episode, std::vector<float> &rs) = 0;
+
+        /**
+         * @brief Faster variant of values, used when plotting the model.
+         *
+         * Some models can do statistics or other things when values() is called,
+         * this method is available for fast plotting without any bookkeeping.
+         */
+        virtual void valuesForPlotting(Episode *episode, std::vector<float> &rs)
+        {
+            values(episode, rs);
+        }
 };
 
 #endif

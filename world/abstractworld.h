@@ -7,10 +7,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -68,6 +68,19 @@ class AbstractWorld
                           std::vector<float> &state) = 0;
 
         /**
+         * @brief Execute an action for which a target state is known.
+         *
+         * This method is called when an initial episode is given to run(). When
+         * this happens, the episode is replayed by telling the world which actions
+         * were taken and what was their outcome.
+         *
+         * @note By default, this method simply calls step(action). Reimplement
+         *       it if your world is stochastic or needs to known the target state.
+         */
+        virtual void stepSupervised(unsigned int action,
+                                    const std::vector<float> &target_state);
+
+        /**
          * @brief Produce a file of any format that represents the contents of
          *        the given model mapped to this world.
          */
@@ -75,12 +88,17 @@ class AbstractWorld
 
         /**
          * @brief Run an agent in the world for a given number of episodes
-         * 
+         *
          * @param model Model used for learning
          * @param learning Learning algorithm
          * @param num_episodes Number of episodes run
          * @param max_episode_length Maximum number of time steps per episode
          * @param batch_size Number of episodes to run between model updates
+         * @param verbose true if this method must print information about the
+         *                rewards obtained by the agent. False for silent operation.
+         * @param start_episode if not null, this episode is replayed before any
+         *                      new episode. This allows to simulate a world from
+         *                      a starting position (with history taken into account)
          *
          * @return A list of episodes. The caller must delete the episodes.
          */
@@ -88,7 +106,9 @@ class AbstractWorld
                                    AbstractLearning *learning,
                                    unsigned int num_episodes,
                                    unsigned int max_episode_length,
-                                   unsigned int batch_size);
+                                   unsigned int batch_size,
+                                   bool verbose = true,
+                                   Episode *start_episode = nullptr);
 
     private:
         /**
