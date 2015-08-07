@@ -49,7 +49,9 @@
 
 unsigned int num_episodes = 5000;
 unsigned int max_timesteps = 1000;
+unsigned int hidden_neurons = 100;
 unsigned int batch_size = 10;
+float discount_factor = 0.9f;
 
 int main(int argc, char **argv) {
 #ifdef ROSCPP_FOUND
@@ -69,7 +71,9 @@ int main(int argc, char **argv) {
             random_initial = true;
         } else if (arg == "tmaze") {
             num_episodes = 50000;
-            world = new TMazeWorld(8, 1);
+            discount_factor = 0.98f;
+
+            world = new TMazeWorld(8, 1000);
         } else if (arg == "gridworld" || arg == "polargridworld") {
             GridWorld::Point initial, obstacle, goal;
 
@@ -114,15 +118,15 @@ int main(int argc, char **argv) {
         } else if (arg == "gaussian") {
             model = new GaussianMixtureModel(0.60, 0.20, 0.05);       // Tailored for the gridworld
         } else if (arg == "perceptron") {
-            model = new PerceptronModel(200);
+            model = new PerceptronModel(hidden_neurons);
         } else if (arg == "stackedgru") {
-            model = new StackedGRUModel(100);
+            model = new StackedGRUModel(hidden_neurons);
         } else if (arg == "stackedlstm") {
-            model = new StackedLSTMModel(100);
+            model = new StackedLSTMModel(hidden_neurons);
         } else if (arg == "qlearning") {
-            learning = new QLearning(0.9, 0.3);
+            learning = new QLearning(discount_factor, 0.3);
         } else if (arg == "advantage") {
-            learning = new AdvantageLearning(0.9, 0.3, 0.5);
+            learning = new AdvantageLearning(discount_factor, 0.3, 0.5);
         } else if (arg == "softmax") {
             if (learning == nullptr) {
                 std::cerr << "Put softmax after the learning algorithm to be filtered" << std::endl;

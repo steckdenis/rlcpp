@@ -97,7 +97,7 @@ void TMazeWorld::step(unsigned int action,
         _pos = pos_x;
     } else if (pos_y == -1 || pos_y == 1 || pos_x < 0 || pos_x >= _length) {
         // Overflow
-        reward = -2.0f;
+        reward = -5.0f;
         finished = false;
     } else {
         // Simple move
@@ -114,6 +114,6 @@ void TMazeWorld::encodeState(unsigned int pos, std::vector<float> &state)
 {
     state.resize(2);
 
-    state[0] = float(_timesteps <= _info_time ? (int)_target : 0);
-    state[1] = float(pos);
+    state[0] = float(pos);
+    state[1] = float(_timesteps <= _info_time ? (int)_target : 0);
 }

@@ -67,7 +67,7 @@ void PolarGridWorld::step(unsigned int action,
     } else {
         // Provide the reward and the other signals
         finished = false;
-        reward = 0.0f;
+        reward = -1.0f;
         encodeState(_current_pos, state);
     }
 }

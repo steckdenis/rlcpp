@@ -39,5 +39,5 @@ float AdaptiveSoftmaxLearning::adjustTemperature(Episode *episode, float td_erro
     }
 
     // Use the new temperature
-    return current_temperature;
+    return std::max(0.2f, current_temperature);
 }
