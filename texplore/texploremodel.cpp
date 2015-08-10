@@ -31,7 +31,7 @@ TExploreModel::TExploreModel(AbstractWorld *world,
                              AbstractLearning *learning,
                              unsigned int rollout_length,
                              Episode::Encoder encoder)
-: _world(new ModelWorld(world, world_model)),
+: _world(new ModelWorld(world, world_model, encoder)),
   _model(values_model),
   _learning(learning),
   _encoder(encoder),
@@ -73,5 +73,6 @@ void TExploreModel::valuesForPlotting(Episode *episode, std::vector<float> &rs)
 
 void TExploreModel::learn(const std::vector<Episode *> &episodes)
 {
+    _model->learn(episodes);
     _world->learn(episodes);
 }

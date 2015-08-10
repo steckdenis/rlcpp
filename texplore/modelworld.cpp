@@ -24,10 +24,11 @@
 #include "model/episode.h"
 #include "model/abstractmodel.h"
 
-ModelWorld::ModelWorld(AbstractWorld *world, AbstractModel *model)
+ModelWorld::ModelWorld(AbstractWorld *world, AbstractModel *model, Episode::Encoder encoder)
 : AbstractWorld(world->numActions()),
   _world(world),
   _model(model),
+  _encoder(encoder),
   _episode(nullptr)
 {
 }
@@ -57,7 +58,7 @@ void ModelWorld::reset()
         delete _episode;
     }
 
-    _episode = new Episode(value_size, value_size, nullptr);
+    _episode = new Episode(value_size, value_size, _encoder);
 }
 
 void ModelWorld::step(unsigned int action,
@@ -123,7 +124,7 @@ void ModelWorld::learn(const std::vector<Episode *> episodes)
             episode->state(t, state);
             episode->state(t + 1, next_state);
 
-            // Compute the state delta
+            // Compute the state delta (between unencoded states)
             for (std::size_t i=0; i<state.size(); ++i) {
                 _values[i] = next_state[i] - state[i];
             }
@@ -143,7 +144,7 @@ void ModelWorld::learn(const std::vector<Episode *> episodes)
     }
 
     // Train the model on the new episodes
-    _model->learn(episodes);
+    _model->learn(model_episodes);
 
     for (Episode *episode : model_episodes) {
         delete episode;
@@ -154,16 +155,8 @@ void ModelWorld::makeModelState(const std::vector<float> &world_state,
                                 unsigned int action,
                                 std::vector<float> &model_state)
 {
-    // Copy the state, and add one variable per possible action (one-hot encoding)
-    model_state.resize(world_state.size() + numActions());
-
-    for (std::size_t i=0; i<model_state.size(); ++i) {
-        if (i < world_state.size()) {
-            model_state[i] = world_state[i];
-        } else if (i - world_state.size() == action) {
-            model_state[i] = 1.0f;
-        } else {
-            model_state[i] = 0.0f;
-        }
-    }
+    // Copy the state, and add one variable for the action (an encoder
+    // may encode this variable if needed by the model)
+    model_state.resize(world_state.size() + 1);
+    model_state[world_state.size()] = float(int(action));
 }

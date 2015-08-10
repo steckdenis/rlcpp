@@ -36,8 +36,11 @@ class ModelWorld : public AbstractWorld
          *
          * @param world World for which a model is built.
          * @param model Model used to approximate the world.
+         * @param encoder Encoder to use to encode the states of the world. For
+         *                instance, neural networks work best when states are
+         *                normalized or one-hot encoded.
          */
-        ModelWorld(AbstractWorld *world, AbstractModel *model);
+        ModelWorld(AbstractWorld *world, AbstractModel *model, Episode::Encoder encoder);
         ~ModelWorld();
 
         virtual void initialState(std::vector<float> &state);
@@ -70,6 +73,8 @@ class ModelWorld : public AbstractWorld
     protected:
         AbstractWorld *_world;
         AbstractModel *_model;
+        Episode::Encoder _encoder;
+
         Episode *_episode;
 
         std::vector<float> _world_state;
