@@ -25,9 +25,10 @@
 
 #include <vector>
 
+#include "model/episode.h"
+
 class AbstractModel;
 class AbstractLearning;
-class Episode;
 
 /**
  * @brief Provide states and rewards in response to actions
@@ -83,8 +84,10 @@ class AbstractWorld
         /**
          * @brief Produce a file of any format that represents the contents of
          *        the given model mapped to this world.
+         *
+         * @param encoder Encoder used when producing states. Can be nullptr for identity.
          */
-        virtual void plotModel(AbstractModel *model);
+        virtual void plotModel(AbstractModel *model, Episode::Encoder encoder);
 
         /**
          * @brief Run an agent in the world for a given number of episodes
@@ -94,6 +97,7 @@ class AbstractWorld
          * @param num_episodes Number of episodes run
          * @param max_episode_length Maximum number of time steps per episode
          * @param batch_size Number of episodes to run between model updates
+         * @param encoder Encoder used to encode the states, can be nullptr for identity
          * @param verbose true if this method must print information about the
          *                rewards obtained by the agent. False for silent operation.
          * @param start_episode if not null, this episode is replayed before any
@@ -107,6 +111,7 @@ class AbstractWorld
                                    unsigned int num_episodes,
                                    unsigned int max_episode_length,
                                    unsigned int batch_size,
+                                   Episode::Encoder encoder,
                                    bool verbose = true,
                                    Episode *start_episode = nullptr);
 

@@ -36,7 +36,7 @@ Network *StackedLSTMModel::createNetwork(Episode *first_episode) const
 {
     static const float learning_rate = 2e-3;
 
-    Network *net = new Network(first_episode->stateSize());
+    Network *net = new Network(first_episode->encodedStateSize());
     Dense *dense_in = new Dense(_hidden_neurons, learning_rate);
     Dense *dense_ingate = new Dense(_hidden_neurons, learning_rate);
     Dense *dense_outgate = new Dense(_hidden_neurons, learning_rate);

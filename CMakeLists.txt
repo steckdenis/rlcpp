@@ -29,7 +29,6 @@ set(SOURCES
     world/gridworld.cpp
     world/polargridworld.cpp
     world/postprocessworld.cpp
-    world/oneofnworld.cpp
     world/scaleworld.cpp
     texplore/modelworld.cpp
     texplore/texploremodel.cpp

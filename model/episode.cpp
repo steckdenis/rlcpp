@@ -52,8 +52,9 @@ static void extract(const std::vector<float> &vector,
     std::copy(vector.begin() + from, vector.begin() + to, rs.begin());
 }
 
-Episode::Episode(unsigned int value_size, unsigned int num_actions)
-: _state_size(0),
+Episode::Episode(unsigned int value_size, unsigned int num_actions, Encoder encoder)
+: _encoder(encoder),
+  _state_size(0),
   _value_size(value_size),
   _num_actions(num_actions)
 {
@@ -87,6 +88,15 @@ unsigned int Episode::stateSize() const
     return _state_size;
 }
 
+unsigned int Episode::encodedStateSize() const
+{
+    std::vector<float> state;
+
+    encodedState(0, state);
+
+    return state.size();
+}
+
 unsigned int Episode::valueSize() const
 {
     return _value_size;
@@ -105,6 +115,16 @@ unsigned int Episode::length() const
 void Episode::state(unsigned int t, std::vector<float> &rs) const
 {
     extract(_states, _state_size, t, rs);
+}
+
+void Episode::encodedState(unsigned int t, std::vector<float> &rs) const
+{
+    state(t, rs);
+
+    // Encode the state using the encoder
+    if (_encoder) {
+        _encoder(rs);
+    }
 }
 
 void Episode::values(unsigned int t, std::vector<float> &rs) const

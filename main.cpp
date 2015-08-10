@@ -33,7 +33,6 @@
 #include "world/tmazeworld.h"
 #include "world/gridworld.h"
 #include "world/polargridworld.h"
-#include "world/oneofnworld.h"
 #include "world/scaleworld.h"
 #include "texplore/texploremodel.h"
 
@@ -55,6 +54,27 @@ unsigned int batch_size = 10;
 unsigned int rollout_length = 50;
 float discount_factor = 0.9f;
 
+/**
+ * @brief One-of-n encoder for a 10x5 world
+ */
+static void oneOfNEncoder(std::vector<float> &state)
+{
+    unsigned int dim1 = 10;
+    unsigned int dim2 = 5;
+
+    // Resize state to its new size, that will be bigger than the original size
+    // because one-hot expands the state space
+    state.resize(dim1 + dim2);
+
+    // Adjust the state
+    for (int i = dim1 + dim2 - 1; i >= 0; --i) {
+        int i1 = int(state[0] + 0.5f);
+        int i2 = int(state[1] + 0.5f);
+
+        state[i] = (i == i1 || (i - dim1) == i2) ? 1.0f : 0.0f;
+    }
+}
+
 int main(int argc, char **argv) {
 #ifdef ROSCPP_FOUND
     // Initialize ROS
@@ -65,6 +85,7 @@ int main(int argc, char **argv) {
     AbstractModel *model = nullptr;
     AbstractLearning *learning = nullptr;
     AbstractLearning *base_learning = nullptr;  // Learning without Softmax or EGreedy
+    Episode::Encoder encoder = nullptr;
     bool random_initial = false;
 
     for (int i=1; i<argc; ++i) {
@@ -72,6 +93,8 @@ int main(int argc, char **argv) {
 
         if (arg == "randominitial") {
             random_initial = true;
+        } else if (arg == "oneofn") {
+            encoder = &oneOfNEncoder;
         } else if (arg == "tmaze") {
             num_episodes = 50000;
             discount_factor = 0.98f;
@@ -98,12 +121,6 @@ int main(int argc, char **argv) {
                 return 1;
             }
             world = new ScaleWorld(world, {1.0f, 0.0f});
-        } else if (arg == "oneofn") {
-            if (world == nullptr) {
-                std::cerr << "Put oneofn after the world to be wrapped" << std::endl;
-                return 1;
-            }
-            world = new OneOfNWorld(world, {0, 0}, {9, 4});     // 10x4 range, okay for the gridworlds and for a short tmaze (corridor of length at most 10)
 #ifdef ROSCPP_FOUND
         } else if (arg == "rospendulum") {
             batch_size = 1;
@@ -161,7 +178,8 @@ int main(int argc, char **argv) {
                 new PerceptronModel(hidden_neurons),
                 model,
                 new SoftmaxLearning(base_learning, 3.0f),   // Great amount of exploration in TEXPLORE rollouts
-                rollout_length
+                rollout_length,
+                encoder
             );
         }
     }
@@ -172,7 +190,7 @@ int main(int argc, char **argv) {
     }
 
     // Simulate the world
-    std::vector<Episode *> episodes = world->run(model, learning, num_episodes, max_timesteps, batch_size);
+    std::vector<Episode *> episodes = world->run(model, learning, num_episodes, max_timesteps, batch_size, encoder);
 
     // Output statistics in a file that can be plotted using gnuplot
     std::ofstream stream("rewards.dat");
@@ -184,7 +202,7 @@ int main(int argc, char **argv) {
     }
 
     // Plot the model
-    world->plotModel(model);
+    world->plotModel(model, encoder);
 
     delete model;
     delete learning;

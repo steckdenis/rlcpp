@@ -54,7 +54,7 @@ void RecurrentNnetModel::values(Episode *episode, std::vector<float> &rs)
         // Convert the last state to an Eigen vector
         Vector last_state;
 
-        episode->state(episode->length() - 1, rs);
+        episode->encodedState(episode->length() - 1, rs);
         NnetModel::vectorToVector(rs, last_state);
 
         // Feed this input to the network
@@ -90,9 +90,7 @@ void RecurrentNnetModel::learn(const std::vector<Episode *> &episodes)
             _network->reset();
 
             for (unsigned int t=start_t; t < episode->length() - 1; ++t) {
-                unsigned int action = episode->action(t);
-
-                episode->state(t, state);
+                episode->encodedState(t, state);
                 episode->values(t, values);
 
                 NnetModel::vectorToVector(state, input);

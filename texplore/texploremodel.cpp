@@ -29,10 +29,12 @@ TExploreModel::TExploreModel(AbstractWorld *world,
                              AbstractModel *world_model,
                              AbstractModel *values_model,
                              AbstractLearning *learning,
-                             unsigned int rollout_length)
+                             unsigned int rollout_length,
+                             Episode::Encoder encoder)
 : _world(new ModelWorld(world, world_model)),
   _model(values_model),
   _learning(learning),
+  _encoder(encoder),
   _rollout_length(rollout_length)
 {
 }
@@ -52,6 +54,7 @@ void TExploreModel::values(Episode *episode, std::vector<float> &rs)
                                                   num_rollouts,
                                                   _rollout_length,
                                                   batch_size,
+                                                  _encoder,
                                                   false,
                                                   episode);
 

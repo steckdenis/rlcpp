@@ -86,6 +86,7 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
                                           unsigned int num_episodes,
                                           unsigned int max_episode_length,
                                           unsigned int batch_size,
+                                          Episode::Encoder encoder,
                                           bool verbose,
                                           Episode *start_episode)
 {
@@ -102,7 +103,7 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
 
         if (!start_episode) {
             // Start a new empty episode
-            episode = new Episode(learning->valueSize(_num_actions), _num_actions);
+            episode = new Episode(learning->valueSize(_num_actions), _num_actions, encoder);
 
             reset();
             initialState(state);
@@ -183,7 +184,7 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
     return episodes;
 }
 
-void AbstractWorld::plotModel(AbstractModel *model)
+void AbstractWorld::plotModel(AbstractModel *model, Episode::Encoder encoder)
 {
     if (_min_state.size() > 2) {
         std::cout << "Cannot plot models with more than 2 state variables" << std::endl;
@@ -216,7 +217,7 @@ void AbstractWorld::plotModel(AbstractModel *model)
     for (float y = min_y; y < max_y; y += dy) {
         for (float x = min_x; x < max_x; x += dx) {
             // Make a dummy episode
-            Episode episode(numActions(), numActions());
+            Episode episode(numActions(), numActions(), encoder);
 
             state[0] = x;
 

@@ -39,7 +39,19 @@
 class Episode
 {
     public:
-        Episode(unsigned int value_size, unsigned int num_actions);
+        typedef void (*Encoder)(std::vector<float> &state);
+
+        /**
+         * @brief Constructor
+         *
+         * @param value_size Number of values to associate with each state (actions + other values if needed)
+         * @param num_actions Number of actions possible in the world
+         * @param encoder Function that encodes a state as returned by encodedState().
+         *                If nullptr, an identity encoding will be used.
+         */
+        Episode(unsigned int value_size,
+                unsigned int num_actions,
+                Encoder encoder);
 
         /**
          * @brief Add a state to the episode.
@@ -67,9 +79,14 @@ class Episode
         void addAction(int action);
 
         /**
-         * @brief Number of floating-point variables in a state observation
+         * @brief Number of floating-point variables in an unencoded state observation
          */
         unsigned int stateSize() const;
+
+        /**
+         * @brief Number of floating-point variables in an encoded state
+         */
+        unsigned int encodedStateSize() const;
 
         /**
          * @brief Number of floating-point variables in a values tuple (may differ
@@ -88,9 +105,15 @@ class Episode
         unsigned int length() const;
 
         /**
-         * @brief Observation for a given time step
+         * @brief Observation for a given time step, unencoded
          */
         void state(unsigned int t, std::vector<float> &rs) const;
+
+        /**
+         * @brief Observation for a given time step, encoded using the encoder
+         *        of this episode.
+         */
+        void encodedState(unsigned int t, std::vector<float> &rs) const;
 
         /**
          * @brief Set of action values for a given time step
@@ -122,6 +145,8 @@ class Episode
         std::vector<float> _values;
         std::vector<float> _rewards;
         std::vector<int> _actions;
+
+        Encoder _encoder;
 
         unsigned int _state_size;
         unsigned int _value_size;

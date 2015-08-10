@@ -33,7 +33,7 @@ PerceptronModel::PerceptronModel(unsigned int hidden_neurons)
 
 Network *PerceptronModel::createNetwork(Episode *first_episode) const
 {
-    Network *network = new Network(first_episode->stateSize());
+    Network *network = new Network(first_episode->encodedStateSize());
 
     Dense *dense1 = new Dense(_hidden_neurons, 1e-2);
     TanhActivation *dense1_act = new TanhActivation;

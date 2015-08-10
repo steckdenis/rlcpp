@@ -57,7 +57,7 @@ void ModelWorld::reset()
         delete _episode;
     }
 
-    _episode = new Episode(value_size, value_size);
+    _episode = new Episode(value_size, value_size, nullptr);
 }
 
 void ModelWorld::step(unsigned int action,
@@ -114,7 +114,7 @@ void ModelWorld::learn(const std::vector<Episode *> episodes)
     std::vector<float> state;
 
     for (Episode *episode : episodes) {
-        Episode *model_episode = new Episode(value_size, value_size);
+        Episode *model_episode = new Episode(value_size, value_size, nullptr);
 
         for (unsigned int t = 0; t < episode->length() - 1; ++t) {
             unsigned int action = episode->action(t);

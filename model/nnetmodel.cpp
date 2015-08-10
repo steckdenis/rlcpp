@@ -45,7 +45,7 @@ void NnetModel::values(Episode *episode, std::vector<float> &rs)
         // Convert the last state to an Eigen vector
         Vector last_state;
 
-        episode->state(episode->length() - 1, rs);
+        episode->encodedState(episode->length() - 1, rs);
         vectorToVector(rs, last_state);
 
         // Feed this input to the network
@@ -71,7 +71,7 @@ void NnetModel::learn(const std::vector<Episode *> &episodes)
         total_size += episode->length() - 1;
     }
 
-    Eigen::MatrixXf inputs(episodes[0]->stateSize(), total_size);
+    Eigen::MatrixXf inputs(episodes[0]->encodedStateSize(), total_size);
     Eigen::MatrixXf outputs(episodes[0]->valueSize(), total_size);
     Eigen::MatrixXf weights(episodes[0]->valueSize(), total_size);
 
@@ -88,7 +88,7 @@ void NnetModel::learn(const std::vector<Episode *> &episodes)
         for (unsigned int t=0; t < episode->length() - 1; ++t) {
             unsigned int action = episode->action(t);
 
-            episode->state(t, state);
+            episode->encodedState(t, state);
             episode->values(t, values);
 
             vectorToCol(state, inputs, index);

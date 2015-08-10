@@ -24,6 +24,7 @@
 #define __TEXPLOREMODEL_H__
 
 #include "model/abstractmodel.h"
+#include "model/episode.h"
 
 class AbstractWorld;
 class AbstractLearning;
@@ -48,12 +49,15 @@ class TExploreModel : public AbstractModel
          *                 values produced by the rollouts are meaningful in the
          *                 real world.
          * @param rollout_length Length of the rollouts, in time steps.
+         * @param encoder State encoder used during the rollouts, if any. Must be
+         *                the same encoder as the one used in the "real" world.
          */
         TExploreModel(AbstractWorld *world,
                       AbstractModel *world_model,
                       AbstractModel *values_model,
                       AbstractLearning *learning,
-                      unsigned int rollout_length);
+                      unsigned int rollout_length,
+                      Episode::Encoder encoder = nullptr);
 
         virtual void values(Episode *episode, std::vector<float> &rs);
         virtual void valuesForPlotting(Episode *episode, std::vector<float> &rs);
@@ -63,6 +67,7 @@ class TExploreModel : public AbstractModel
         ModelWorld *_world;
         AbstractModel *_model;
         AbstractLearning *_learning;
+        Episode::Encoder _encoder;
         unsigned int _rollout_length;
 };
 
