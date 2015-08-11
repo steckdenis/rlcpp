@@ -55,23 +55,23 @@ unsigned int rollout_length = 50;
 float discount_factor = 0.9f;
 
 /**
- * @brief One-of-n encoder for a 10x5 world
+ * @brief One-of-n encoder for 16 distinct values per state variable
  */
 static void oneOfNEncoder(std::vector<float> &state)
 {
-    unsigned int dim1 = 10;
-    unsigned int dim2 = 5;
+    unsigned int num_vars = state.size();
+    unsigned int var_dim = 16;
 
     // Resize state to its new size, that will be bigger than the original size
     // because one-hot expands the state space
-    state.resize(dim1 + dim2);
+    state.resize(num_vars * var_dim);
 
     // Adjust the state
-    for (int i = dim1 + dim2 - 1; i >= 0; --i) {
-        int i1 = int(state[0] + 0.5f);
-        int i2 = int(state[1] + 0.5f);
+    for (int i = num_vars * var_dim - 1; i >= 0; --i) {
+        unsigned int state_variable = i / var_dim;
+        unsigned int value = i % var_dim;
 
-        state[i] = (i == i1 || (i - dim1) == i2) ? 1.0f : 0.0f;
+        state[i] = int(state[state_variable] + 0.5f) == value ? 1.0f : 0.0f;
     }
 }
 

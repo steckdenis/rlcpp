@@ -115,7 +115,7 @@ void ModelWorld::learn(const std::vector<Episode *> episodes)
     std::vector<float> state;
 
     for (Episode *episode : episodes) {
-        Episode *model_episode = new Episode(value_size, value_size, nullptr);
+        Episode *model_episode = new Episode(value_size, value_size, _encoder);
 
         for (unsigned int t = 0; t < episode->length() - 1; ++t) {
             unsigned int action = episode->action(t);
@@ -157,6 +157,8 @@ void ModelWorld::makeModelState(const std::vector<float> &world_state,
 {
     // Copy the state, and add one variable for the action (an encoder
     // may encode this variable if needed by the model)
+    model_state = world_state;
+
     model_state.resize(world_state.size() + 1);
     model_state[world_state.size()] = float(int(action));
 }
