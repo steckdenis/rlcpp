@@ -23,8 +23,9 @@
 #include "nnetmodel.h"
 #include "episode.h"
 
-NnetModel::NnetModel()
-: _network(nullptr)
+NnetModel::NnetModel(bool mask_actions)
+: _network(nullptr),
+  _mask_actions(mask_actions)
 {
 }
 
@@ -94,17 +95,23 @@ void NnetModel::learn(const std::vector<Episode *> &episodes)
             vectorToCol(state, inputs, index);
             vectorToCol(values, outputs, index);
 
-            // Use only the value associated with the action that has been taken
-            // when computing the errors
-            weights.col(index).setZero();
-            weights(action, index) = 1.0f;
+            if (_mask_actions) {
+                // Use only the value associated with the action that has been taken
+                // when computing the errors
+                weights.col(index).setZero();
+                weights(action, index) = 1.0f;
+            }
 
             ++index;
         }
     }
 
     // Train the network on that data
-    _network->train(inputs, outputs, weights, 10, 4, true);
+    if (_mask_actions) {
+        _network->train(inputs, outputs, weights, 10, 4, true);
+    } else {
+        _network->train(inputs, outputs, 10, 4, true);
+    }
 }
 
 void NnetModel::vectorToVector(const std::vector<float> &stl, Vector &eigen)

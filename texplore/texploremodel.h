@@ -41,7 +41,9 @@ class TExploreModel : public AbstractModel
          * @brief Constructor
          *
          * @param world World in which the agent runs (the "real" world)
-         * @param world_model Model used to approximate the real world
+         * @param world_model Model used to approximate the real world. Be sure that
+         *                    this model does not mask actions, if applicable
+         *                    (PerceptronModel, GaussianMixtureModel).
          * @param values_model Model used to approximate the Q or Advantage values
          *                     obtained by the rollouts.
          * @param learning Learning algorithm used to perform the rollouts. Should

@@ -51,8 +51,9 @@ unsigned int num_episodes = 5000;
 unsigned int max_timesteps = 1000;
 unsigned int hidden_neurons = 100;
 unsigned int batch_size = 10;
-unsigned int rollout_length = 50;
+unsigned int rollout_length = 10;
 float discount_factor = 0.9f;
+float learning_factor = 0.2f;
 
 /**
  * @brief One-of-n encoder for 16 distinct values per state variable
@@ -136,18 +137,18 @@ int main(int argc, char **argv) {
         } else if (arg == "table") {
             model = new TableModel;
         } else if (arg == "gaussian") {
-            model = new GaussianMixtureModel(0.60, 0.20, 0.05);       // Tailored for the gridworld
+            model = new GaussianMixtureModel(0.60, 0.20, 0.05, true);       // Tailored for the gridworld
         } else if (arg == "perceptron") {
-            model = new PerceptronModel(hidden_neurons);
+            model = new PerceptronModel(hidden_neurons, true);
         } else if (arg == "stackedgru") {
             model = new StackedGRUModel(hidden_neurons);
         } else if (arg == "stackedlstm") {
             model = new StackedLSTMModel(hidden_neurons);
         } else if (arg == "qlearning") {
-            learning = new QLearning(discount_factor, 0.3);
+            learning = new QLearning(discount_factor, learning_factor);
             base_learning = learning;
         } else if (arg == "advantage") {
-            learning = new AdvantageLearning(discount_factor, 0.3, 0.5);
+            learning = new AdvantageLearning(discount_factor, learning_factor, 0.5);
             base_learning = learning;
         } else if (arg == "softmax") {
             if (learning == nullptr) {
@@ -171,11 +172,15 @@ int main(int argc, char **argv) {
 
             learning = new EGreedyLearning(learning, 0.2);
         } else if (arg == "texplore") {
-            batch_size = 1;
+            if (world == nullptr || model == nullptr || learning == nullptr) {
+                std::cerr << "texplore can be used only after a world, a model and a learning algorithm" << std::endl;
+                return 1;
+            }
 
+            batch_size = 1;
             model = new TExploreModel(
                 world,
-                new PerceptronModel(hidden_neurons),
+                new PerceptronModel(hidden_neurons, false),
                 model,
                 new SoftmaxLearning(base_learning, 3.0f),   // Great amount of exploration in TEXPLORE rollouts
                 rollout_length,

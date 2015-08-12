@@ -7,10 +7,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -46,8 +46,10 @@ class GaussianMixtureModel : public AbstractModel
          *              is used in a discrete world, some noise has to be added
          *              in order to prevent the gaussians from degenerating to
          *              diracs (and vanishing due to rounding errors)
+         * @param mask_actions Only learn values associated with the action that
+         *                     has been taken, instead of learning all the values.
          */
-        GaussianMixtureModel(float var_initial, float novelty, float noise);
+        GaussianMixtureModel(float var_initial, float novelty, float noise, bool mask_actions);
         virtual ~GaussianMixtureModel();
 
         virtual void values(Episode *episode, std::vector<float> &rs);
@@ -59,6 +61,7 @@ class GaussianMixtureModel : public AbstractModel
     private:
         float _var_initial;
         float _novelty;
+        bool _mask_actions;
 
         std::normal_distribution<float> _noise_distribution;
         std::default_random_engine _random_engine;

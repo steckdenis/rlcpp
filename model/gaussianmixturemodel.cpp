@@ -7,10 +7,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,9 +28,10 @@
 #include <random>
 #include <iostream>
 
-GaussianMixtureModel::GaussianMixtureModel(float var_initial, float novelty, float noise)
+GaussianMixtureModel::GaussianMixtureModel(float var_initial, float novelty, float noise, bool mask_actions)
 : _var_initial(var_initial),
   _novelty(novelty),
+  _mask_actions(mask_actions),
   _noise_distribution(0.0f, noise)
 {
 }
@@ -87,10 +88,17 @@ void GaussianMixtureModel::learn(const std::vector<Episode *> &episodes)
             episode->state(t, state);
             episode->values(t, values);
 
-            // Update the model of the selected action
             vectorToVectorXf(state, input);
 
-            _models[action]->setValue(input, values[action]);
+            if (_mask_actions) {
+                // Update the model of the selected action
+                _models[action]->setValue(input, values[action]);
+            } else {
+                // Update all the models
+                for (unsigned int a=0; a<episode->valueSize(); ++a) {
+                    _models[a]->setValue(input, values[a]);
+                }
+            }
         }
     }
 
