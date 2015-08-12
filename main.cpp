@@ -84,6 +84,7 @@ int main(int argc, char **argv) {
 
     AbstractWorld *world = nullptr;
     AbstractModel *model = nullptr;
+    AbstractModel *world_model = nullptr;
     AbstractLearning *learning = nullptr;
     AbstractLearning *base_learning = nullptr;  // Learning without Softmax or EGreedy
     Episode::Encoder encoder = nullptr;
@@ -136,14 +137,20 @@ int main(int argc, char **argv) {
 #endif
         } else if (arg == "table") {
             model = new TableModel;
+            world_model = new TableModel;
         } else if (arg == "gaussian") {
-            model = new GaussianMixtureModel(0.60, 0.20, 0.05, true);       // Tailored for the gridworld
+            // Tailored for the gridworld
+            model = new GaussianMixtureModel(0.60, 0.20, 0.05, true);
+            world_model = new GaussianMixtureModel(0.60, 0.20, 0.05, false);
         } else if (arg == "perceptron") {
             model = new PerceptronModel(hidden_neurons, true);
+            world_model = new PerceptronModel(hidden_neurons, false);
         } else if (arg == "stackedgru") {
             model = new StackedGRUModel(hidden_neurons);
+            world_model = new StackedGRUModel(hidden_neurons);
         } else if (arg == "stackedlstm") {
             model = new StackedLSTMModel(hidden_neurons);
+            world_model = new StackedLSTMModel(hidden_neurons);
         } else if (arg == "qlearning") {
             learning = new QLearning(discount_factor, learning_factor);
             base_learning = learning;
@@ -180,7 +187,7 @@ int main(int argc, char **argv) {
             batch_size = 1;
             model = new TExploreModel(
                 world,
-                new PerceptronModel(hidden_neurons, false),
+                world_model,
                 model,
                 new SoftmaxLearning(base_learning, 3.0f),   // Great amount of exploration in TEXPLORE rollouts
                 rollout_length,
@@ -210,6 +217,7 @@ int main(int argc, char **argv) {
     world->plotModel(model, encoder);
 
     delete model;
+    delete world_model;
     delete learning;
     delete world;
 }
