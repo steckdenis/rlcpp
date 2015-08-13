@@ -63,6 +63,11 @@ static void oneOfNEncoder(std::vector<float> &state)
     unsigned int num_vars = state.size();
     unsigned int var_dim = 16;
 
+    // Clamp the state variables between 0 and var_dim-1
+    for (unsigned int i=0; i<num_vars; ++i) {
+        state[i] = std::max(0.0f, std::min(float(var_dim-1), state[i]));
+    }
+
     // Resize state to its new size, that will be bigger than the original size
     // because one-hot expands the state space
     state.resize(num_vars * var_dim);
