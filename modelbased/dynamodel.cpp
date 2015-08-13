@@ -20,40 +20,35 @@
  * THE SOFTWARE.
  */
 
-#include "texploremodel.h"
+#include "dynamodel.h"
 #include "modelworld.h"
 
 #include "model/episode.h"
 
-TExploreModel::TExploreModel(AbstractWorld *world,
-                             AbstractModel *world_model,
-                             AbstractModel *values_model,
-                             AbstractLearning *learning,
-                             unsigned int rollout_length,
-                             Episode::Encoder encoder)
+DynaModel::DynaModel(AbstractWorld *world,
+                     AbstractModel *world_model,
+                     AbstractModel *values_model,
+                     AbstractLearning *learning,
+                     unsigned int rollout_length,
+                     unsigned int num_rollouts,
+                     Episode::Encoder encoder)
 : _world(new ModelWorld(world, world_model, encoder)),
   _model(values_model),
   _learning(learning),
   _encoder(encoder),
-  _rollout_length(rollout_length)
+  _rollout_length(rollout_length),
+  _num_rollouts(num_rollouts)
 {
 }
 
-void TExploreModel::values(Episode *episode, std::vector<float> &rs)
+void DynaModel::values(Episode *episode, std::vector<float> &rs)
 {
-    std::vector<float> &state = rs;
-
     // Perform some rollouts from the current state
-    unsigned int num_rollouts = 3;
-    unsigned int batch_size = 1;
-
-    episode->state(episode->length() - 1, state);
-
     std::vector<Episode *> episodes = _world->run(_model,
                                                   _learning,
-                                                  num_rollouts,
+                                                  _num_rollouts,
                                                   _rollout_length,
-                                                  batch_size,
+                                                  _num_rollouts,
                                                   _encoder,
                                                   false,
                                                   episode);
@@ -66,12 +61,12 @@ void TExploreModel::values(Episode *episode, std::vector<float> &rs)
     _model->values(episode, rs);
 }
 
-void TExploreModel::valuesForPlotting(Episode *episode, std::vector<float> &rs)
+void DynaModel::valuesForPlotting(Episode *episode, std::vector<float> &rs)
 {
     _model->valuesForPlotting(episode, rs);
 }
 
-void TExploreModel::learn(const std::vector<Episode *> &episodes)
+void DynaModel::learn(const std::vector<Episode *> &episodes)
 {
     _model->learn(episodes);
     _world->learn(episodes);

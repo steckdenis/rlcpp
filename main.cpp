@@ -34,7 +34,7 @@
 #include "world/gridworld.h"
 #include "world/polargridworld.h"
 #include "world/scaleworld.h"
-#include "texplore/texploremodel.h"
+#include "modelbased/dynamodel.h"
 
 #ifdef ROSCPP_FOUND
     #include "world/rosworld.h"
@@ -52,6 +52,7 @@ unsigned int max_timesteps = 1000;
 unsigned int hidden_neurons = 100;
 unsigned int batch_size = 10;
 unsigned int rollout_length = 10;
+unsigned int num_rollouts = 1;
 float discount_factor = 0.9f;
 float learning_factor = 0.2f;
 
@@ -188,19 +189,20 @@ int main(int argc, char **argv) {
             }
 
             learning = new EGreedyLearning(learning, 0.2);
-        } else if (arg == "texplore") {
+        } else if (arg == "dyna") {
             if (world == nullptr || model == nullptr || learning == nullptr) {
                 std::cerr << "texplore can be used only after a world, a model and a learning algorithm" << std::endl;
                 return 1;
             }
 
             batch_size = 1;
-            model = new TExploreModel(
+            model = new DynaModel(
                 world,
                 world_model,
                 model,
                 new SoftmaxLearning(base_learning, 3.0f),   // Great amount of exploration in TEXPLORE rollouts
                 rollout_length,
+                num_rollouts,
                 encoder
             );
         }

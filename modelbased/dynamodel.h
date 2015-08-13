@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef __TEXPLOREMODEL_H__
-#define __TEXPLOREMODEL_H__
+#ifndef __DYNAMODEL_H__
+#define __DYNAMODEL_H__
 
 #include "model/abstractmodel.h"
 #include "model/episode.h"
@@ -31,10 +31,10 @@ class AbstractLearning;
 class ModelWorld;
 
 /**
- * @brief Model based on TExplore (Hester, 2013), that learns a model of the world
-          and use it to produce Q or Advantage values.
+ * @brief Model based on Dyna, that learns a model of the world and use it to
+ *        produce Q or Advantage values by performing K rollouts at each time-step
  */
-class TExploreModel : public AbstractModel
+class DynaModel : public AbstractModel
 {
     public:
         /**
@@ -51,15 +51,17 @@ class TExploreModel : public AbstractModel
          *                 values produced by the rollouts are meaningful in the
          *                 real world.
          * @param rollout_length Length of the rollouts, in time steps.
+         * @param num_rollouts Number of rollouts to perform at each time step.
          * @param encoder State encoder used during the rollouts, if any. Must be
          *                the same encoder as the one used in the "real" world.
          */
-        TExploreModel(AbstractWorld *world,
-                      AbstractModel *world_model,
-                      AbstractModel *values_model,
-                      AbstractLearning *learning,
-                      unsigned int rollout_length,
-                      Episode::Encoder encoder = nullptr);
+        DynaModel(AbstractWorld *world,
+                  AbstractModel *world_model,
+                  AbstractModel *values_model,
+                  AbstractLearning *learning,
+                  unsigned int rollout_length,
+                  unsigned int num_rollouts,
+                  Episode::Encoder encoder = nullptr);
 
         virtual void values(Episode *episode, std::vector<float> &rs);
         virtual void valuesForPlotting(Episode *episode, std::vector<float> &rs);
@@ -71,6 +73,7 @@ class TExploreModel : public AbstractModel
         AbstractLearning *_learning;
         Episode::Encoder _encoder;
         unsigned int _rollout_length;
+        unsigned int _num_rollouts;
 };
 
 #endif
