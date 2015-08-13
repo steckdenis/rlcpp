@@ -76,8 +76,13 @@ static void oneOfNEncoder(std::vector<float> &state)
     for (int i = num_vars * var_dim - 1; i >= 0; --i) {
         unsigned int state_variable = i / var_dim;
         unsigned int value = i % var_dim;
+        float delta = 0.5f * std::abs(state[state_variable] - float(value));
 
-        state[i] = int(state[state_variable] + 0.5f) == value ? 1.0f : 0.0f;
+        if (delta < 1.0f) {
+            state[i] = 1.0f - delta;
+        } else {
+            state[i] = 0.0f;
+        }
     }
 }
 
