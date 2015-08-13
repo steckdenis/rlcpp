@@ -22,6 +22,8 @@
 
 #include "softmaxlearning.h"
 
+#include <nnetcpp/activation.h>
+
 #include <cmath>
 #include <numeric>
 
@@ -44,7 +46,7 @@ void SoftmaxLearning::actions(Episode *episode, std::vector<float> &probabilitie
 
     // Take the exponentials of all those values
     for (float &v : probabilities) {
-        v = std::exp(v / _temperature);
+        v = nnetcppinternal::_exp(v / _temperature);
     }
 
     float sum = std::accumulate(probabilities.begin(), probabilities.end(), 0.0f);
