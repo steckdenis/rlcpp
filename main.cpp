@@ -47,6 +47,8 @@
 #include <fstream>
 #include <iostream>
 
+#include <fenv.h>
+
 unsigned int num_episodes = 5000;
 unsigned int max_timesteps = 1000;
 unsigned int hidden_neurons = 100;
@@ -92,6 +94,9 @@ int main(int argc, char **argv) {
     // Initialize ROS
     ros::init(argc, argv, "rlcpp", ros::init_options::AnonymousName | ros::init_options::NoSigintHandler);
 #endif
+
+    // Enable FPU exceptions so that NaN and infinites can be traced back
+    feenableexcept(FE_INVALID);
 
     AbstractWorld *world = nullptr;
     AbstractModel *model = nullptr;
