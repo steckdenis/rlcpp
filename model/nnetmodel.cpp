@@ -108,9 +108,9 @@ void NnetModel::learn(const std::vector<Episode *> &episodes)
 
     // Train the network on that data
     if (_mask_actions) {
-        _network->train(inputs, outputs, weights, 10, 4, true);
+        _network->train(inputs, outputs, weights, 10, 4);
     } else {
-        _network->train(inputs, outputs, 10, 4, true);
+        _network->train(inputs, outputs, 10, 4);
     }
 }
 
