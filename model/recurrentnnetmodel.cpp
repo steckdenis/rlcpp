@@ -45,11 +45,16 @@ void RecurrentNnetModel::values(Episode *episode, std::vector<float> &rs)
         std::fill(rs.begin(), rs.end(), 0.0f);
     } else {
         // Reset the network if a new episode has been started
-        if (episode->length() <= _last_episode_length) {
+        if (episode->length() == 1) {
             _network->reset();
+        } else {
+            assert(episode->length() == _last_episode_length + 1);
         }
 
         _last_episode_length = episode->length();
+
+        // Tell the network which time-step it considers
+        _network->setTimestep(episode->length() - 1);
 
         // Convert the last state to an Eigen vector
         Vector last_state;
@@ -72,34 +77,32 @@ void RecurrentNnetModel::learn(const std::vector<Episode *> &episodes)
 {
     std::vector<float> state;
     std::vector<float> values;
-    Vector input;
-    Vector output;
 
     // Learn all the episodes separately, because they represent sequences
     // of observations that must be kept in order
-    for (Episode *episode : episodes) {
-        // Create the network if needed
-        if (!_network) {
-            _network = createNetwork(episode);
-        }
+    for (int i=0; i<50; ++i) {
+        for (Episode *episode : episodes) {
+            // Create the network if needed
+            if (!_network) {
+                _network = createNetwork(episode);
+            }
 
-        // Learn all the values obtained during the episode
-        unsigned int start_t = 0; // std::max(0U, episode->length() - 100);
+            // Learn all the values obtained during the episode
+            unsigned int size = episode->length() - 1;
 
-        for (int i=0; i<3; ++i) {
-            _network->reset();
+            Eigen::MatrixXf inputs(episode->encodedStateSize(), size);
+            Eigen::MatrixXf outputs(episode->valueSize(), size);
 
-            for (unsigned int t=start_t; t < episode->length() - 1; ++t) {
+            for (unsigned int t=0; t < episode->length() - 1; ++t) {
                 episode->encodedState(t, state);
                 episode->values(t, values);
 
-                NnetModel::vectorToVector(state, input);
-                NnetModel::vectorToVector(values, output);
-
-                // Use only the value associated with the action that has been taken
-                // when computing the errors
-                _network->trainSample(input, output);
+                NnetModel::vectorToCol(state, inputs, t);
+                NnetModel::vectorToCol(values, outputs, t);
             }
+
+            // Train the network on that data
+            _network->trainSequence(inputs, outputs, 1);
         }
     }
 }

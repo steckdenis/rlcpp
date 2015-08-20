@@ -51,7 +51,7 @@
 
 unsigned int num_episodes = 5000;
 unsigned int max_timesteps = 1000;
-unsigned int hidden_neurons = 100;
+unsigned int hidden_neurons = 50;
 unsigned int batch_size = 10;
 unsigned int rollout_length = 10;
 unsigned int num_rollouts = 1;
