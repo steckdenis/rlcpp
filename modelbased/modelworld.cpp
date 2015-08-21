@@ -59,6 +59,7 @@ void ModelWorld::reset()
     }
 
     _episode = new Episode(value_size, value_size, _encoder);
+    _model->nextEpisode();
 }
 
 void ModelWorld::step(unsigned int action,

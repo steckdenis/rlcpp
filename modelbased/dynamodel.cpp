@@ -71,3 +71,8 @@ void DynaModel::learn(const std::vector<Episode *> &episodes)
     _model->learn(episodes);
     _world->learn(episodes);
 }
+
+void DynaModel::nextEpisode()
+{
+    _model->nextEpisode();
+}

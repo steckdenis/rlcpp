@@ -37,6 +37,16 @@ RecurrentNnetModel::~RecurrentNnetModel()
     }
 }
 
+void RecurrentNnetModel::nextEpisode()
+{
+    _last_episode_length = 0;
+
+    // Reset the network between time steps
+    if (_network) {
+        _network->reset();
+    }
+}
+
 void RecurrentNnetModel::values(Episode *episode, std::vector<float> &rs)
 {
     if (!_network) {
@@ -44,32 +54,34 @@ void RecurrentNnetModel::values(Episode *episode, std::vector<float> &rs)
         rs.resize(episode->valueSize());
         std::fill(rs.begin(), rs.end(), 0.0f);
     } else {
-        // Reset the network if a new episode has been started
-        if (episode->length() == 1) {
-            _network->reset();
-        } else {
-            assert(episode->length() == _last_episode_length + 1);
+        // Use _last_episode_length..length time steps for prediction. This allows
+        // the model to be kept "up-to-date" if time steps are skipped in the episode,
+        // for instance of AbstractWorld copies N time steps from an episode and
+        // then tries to predict the next one.
+        for (unsigned int t=_last_episode_length; t<episode->length(); ++t) {
+            // Tell the network which time-step it considers
+            _network->setCurrentTimestep(t);
+
+            // Convert the last state to an Eigen vector
+            Vector last_state;
+
+            episode->encodedState(t, rs);
+            NnetModel::vectorToVector(rs, last_state);
+
+            // Feed this input to the network
+            Vector prediction = _network->predict(last_state);
+
+            // If this is the last time-step to predict, copy its output to rs
+            if (t == episode->length() - 1) {
+                rs.resize(episode->valueSize());
+
+                for (std::size_t i=0; i<rs.size(); ++i) {
+                    rs[i] = prediction(i);
+                }
+            }
         }
 
         _last_episode_length = episode->length();
-
-        // Tell the network which time-step it considers
-        _network->setCurrentTimestep(episode->length() - 1);
-
-        // Convert the last state to an Eigen vector
-        Vector last_state;
-
-        episode->encodedState(episode->length() - 1, rs);
-        NnetModel::vectorToVector(rs, last_state);
-
-        // Feed this input to the network
-        Vector prediction = _network->predict(last_state);
-
-        rs.resize(episode->valueSize());
-
-        for (std::size_t i=0; i<rs.size(); ++i) {
-            rs[i] = prediction(i);
-        }
     }
 }
 

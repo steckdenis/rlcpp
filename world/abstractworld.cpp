@@ -124,6 +124,7 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
         }
 
         // Initial value
+        model->nextEpisode();
         model->values(episode, values);
         episode->addValues(values);
 
@@ -232,6 +233,7 @@ void AbstractWorld::plotModel(AbstractModel *model, Episode::Encoder encoder)
             episode.addState(state);
 
             // Query the values from the model
+            model->nextEpisode();
             model->valuesForPlotting(&episode, values);
 
             // And print them in the output streams
