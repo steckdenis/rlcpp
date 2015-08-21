@@ -165,6 +165,9 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
         // Let the learning update the values of the last state that has been visited
         learning->actions(episode, values, td_error);
 
+        // Tell the episode whether it has been aborted or has reached the goal
+        episode->setAborted(!finished);
+
         // If a batch has been finished, update the model
         episodes.push_back(episode);
         learn_episodes.push_back(episode);

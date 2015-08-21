@@ -79,6 +79,12 @@ class Episode
         void addAction(int action);
 
         /**
+         * @brief Set whether the episode has ended because the maximum time steps
+         *        have been reached (instead of the goal)
+         */
+        void setAborted(bool aborted);
+
+        /**
          * @brief Number of floating-point variables in an unencoded state observation
          */
         unsigned int stateSize() const;
@@ -103,6 +109,14 @@ class Episode
          * @brief Number of observations in this episode
          */
         unsigned int length() const;
+
+        /**
+         * @brief Whether the episode ended because the maximum number of time steps
+         *        has been reached.
+         *
+         * If setAborted() was never called, this function returns false.
+         */
+        bool wasAborted() const;
 
         /**
          * @brief Observation for a given time step, unencoded
@@ -151,6 +165,7 @@ class Episode
         unsigned int _state_size;
         unsigned int _value_size;
         unsigned int _num_actions;
+        bool _aborted;
 };
 
 #endif

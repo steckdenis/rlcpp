@@ -56,7 +56,8 @@ Episode::Episode(unsigned int value_size, unsigned int num_actions, Encoder enco
 : _encoder(encoder),
   _state_size(0),
   _value_size(value_size),
-  _num_actions(num_actions)
+  _num_actions(num_actions),
+  _aborted(false)
 {
 }
 
@@ -81,6 +82,11 @@ void Episode::addReward(float reward)
 void Episode::addAction(int action)
 {
     _actions.push_back(action);
+}
+
+void Episode::setAborted(bool aborted)
+{
+    _aborted = aborted;
 }
 
 unsigned int Episode::stateSize() const
@@ -110,6 +116,11 @@ unsigned int Episode::numActions() const
 unsigned int Episode::length() const
 {
     return _states.size() / _state_size;
+}
+
+bool Episode::wasAborted() const
+{
+    return _aborted;
 }
 
 void Episode::state(unsigned int t, std::vector<float> &rs) const
