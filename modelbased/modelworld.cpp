@@ -94,12 +94,19 @@ void ModelWorld::step(unsigned int action,
 void ModelWorld::stepSupervised(unsigned int action,
                                 const std::vector<float> &target_state)
 {
-    // Perform the action as usual, so that the episode is complete (and even
-    // has near-valid rewards if a model uses this information)
-    bool finished;
-    float reward;
+    // Dummy values
+    unsigned int value_size = _world_state.size() + 2;
 
-    step(action, finished, reward, _world_state);
+    _values.resize(value_size);
+    std::fill(_values.begin(), _values.end(), 0.0f);
+
+    // Add the current state to the episode
+    makeModelState(_world_state, action, _model_state);
+
+    _episode->addState(_model_state);
+    _episode->addAction(action);
+    _episode->addReward(0.0f);          // Dummy reward and values
+    _episode->addValues(_values);
 
     // Copy the target state to _world_state, which will be added to the episode
     // at the next step (and hence represents the target state)
