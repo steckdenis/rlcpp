@@ -79,7 +79,8 @@ class AbstractWorld
          *       it if your world is stochastic or needs to known the target state.
          */
         virtual void stepSupervised(unsigned int action,
-                                    const std::vector<float> &target_state);
+                                    const std::vector<float> &target_state,
+                                    float reward);
 
         /**
          * @brief Produce a file of any format that represents the contents of

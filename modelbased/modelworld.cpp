@@ -92,7 +92,8 @@ void ModelWorld::step(unsigned int action,
 }
 
 void ModelWorld::stepSupervised(unsigned int action,
-                                const std::vector<float> &target_state)
+                                const std::vector<float> &target_state,
+                                float reward)
 {
     // Dummy values
     unsigned int value_size = _world_state.size() + 2;
@@ -100,12 +101,14 @@ void ModelWorld::stepSupervised(unsigned int action,
     _values.resize(value_size);
     std::fill(_values.begin(), _values.end(), 0.0f);
 
+    _values[value_size - 2] = reward;
+
     // Add the current state to the episode
     makeModelState(_world_state, action, _model_state);
 
     _episode->addState(_model_state);
     _episode->addAction(action);
-    _episode->addReward(0.0f);          // Dummy reward and values
+    _episode->addReward(reward);
     _episode->addValues(_values);
 
     // Copy the target state to _world_state, which will be added to the episode

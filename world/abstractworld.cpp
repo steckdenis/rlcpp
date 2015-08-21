@@ -70,12 +70,13 @@ unsigned int AbstractWorld::numActions() const
     return _num_actions;
 }
 
-void AbstractWorld::stepSupervised(unsigned int action, const std::vector<float> &target_state)
+void AbstractWorld::stepSupervised(unsigned int action,
+                                   const std::vector<float> &target_state,
+                                   float reward)
 {
     (void) target_state;
 
     bool finished;
-    float reward;
     std::vector<float> state;
 
     step(action, finished, reward, state);
@@ -118,7 +119,7 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
 
             for (unsigned int t = 0; t < episode->length() - 1; ++t) {
                 episode->state(t + 1, state);
-                stepSupervised(episode->action(t), state);
+                stepSupervised(episode->action(t), state, episode->reward(t));
             }
         }
 

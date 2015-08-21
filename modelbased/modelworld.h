@@ -50,7 +50,8 @@ class ModelWorld : public AbstractWorld
                           float &reward,
                           std::vector<float> &state);
         virtual void stepSupervised(unsigned int action,
-                                    const std::vector<float> &target_state);
+                                    const std::vector<float> &target_state,
+                                    float reward);
 
         /**
          * @brief Use a list of episodes in order to learn the model of the world
