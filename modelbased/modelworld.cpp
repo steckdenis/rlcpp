@@ -52,7 +52,7 @@ void ModelWorld::reset()
     initialState(_world_state);
 
     // Start a new episode
-    unsigned int value_size = _world_state.size() + 1;  // Predict state gradient and reward
+    unsigned int value_size = _world_state.size() + 2;  // Predict state gradient, reward and finished
 
     if (_episode) {
         delete _episode;
@@ -66,6 +66,8 @@ void ModelWorld::step(unsigned int action,
                       float &reward,
                       std::vector<float> &state)
 {
+    unsigned int state_size = _world_state.size();
+
     // Add the current state and the action to the episode
     makeModelState(_world_state, action, _model_state);
 
@@ -75,13 +77,13 @@ void ModelWorld::step(unsigned int action,
     // Use this updated episode to predict the next state
     _model->values(_episode, _values);
 
-    for (std::size_t i=0; i<_world_state.size(); ++i) {
+    for (unsigned int i=0; i<state_size; ++i) {
         _world_state[i] += _values[i];          // Add delta to the current state in order to get the next one
     }
 
     // Update the output parameters
-    finished = false;
-    reward = _values.back();
+    reward = _values[state_size];
+    finished = (_values[state_size + 1] > 0.5f);
     state = _world_state;
 
     // And complete the episode
@@ -110,7 +112,7 @@ void ModelWorld::learn(const std::vector<Episode *> episodes)
 
     // Convert "world episodes" to "model episodes". This conversion basically
     // consists in converting state sequences to state deltas.
-    unsigned int value_size = _world_state.size() + 1;
+    unsigned int value_size = _world_state.size() + 2;
     std::vector<float> next_state;
     std::vector<float> state;
 
@@ -120,6 +122,7 @@ void ModelWorld::learn(const std::vector<Episode *> episodes)
         for (unsigned int t = 0; t < episode->length() - 1; ++t) {
             unsigned int action = episode->action(t);
             float reward = episode->reward(t);
+            bool finished = false;
 
             episode->state(t, state);
             episode->state(t + 1, next_state);
@@ -129,7 +132,16 @@ void ModelWorld::learn(const std::vector<Episode *> episodes)
                 _values[i] = next_state[i] - state[i];
             }
 
-            _values[state.size()] = reward;
+            // If we have reached the end of the episode, see whether it was
+            // because we have reached the goal or because the time limit has
+            // been reached.
+            if (t == episode->length() - 2) {
+                model_episode->setAborted(episode->wasAborted());
+                finished = !episode->wasAborted();
+            }
+
+            _values[value_size - 2] = reward;
+            _values[value_size - 1] = (finished ? 1.0f : 0.0f);
 
             // Add the state delta and expected prediction to the model episode
             makeModelState(state, action, _model_state);
@@ -138,6 +150,7 @@ void ModelWorld::learn(const std::vector<Episode *> episodes)
             model_episode->addAction(action);
             model_episode->addReward(reward);
             model_episode->addValues(_values);
+            model_episode->setAborted(episode->wasAborted());
         }
 
         model_episodes.push_back(model_episode);

@@ -48,13 +48,13 @@ void GridWorld::initialState(std::vector<float> &state)
 
 void GridWorld::reset()
 {
-    _current_pos = _initial;
-
     if (_stochastic) {
         // For the next episode, the initial position is moved
         _initial.x = std::rand() % _width;
         _initial.y = std::rand() % _height;
     }
+
+    _current_pos = _initial;
 }
 
 void GridWorld::step(unsigned int action,
