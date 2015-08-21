@@ -54,7 +54,7 @@ void RecurrentNnetModel::values(Episode *episode, std::vector<float> &rs)
         _last_episode_length = episode->length();
 
         // Tell the network which time-step it considers
-        _network->setTimestep(episode->length() - 1);
+        _network->setCurrentTimestep(episode->length() - 1);
 
         // Convert the last state to an Eigen vector
         Vector last_state;
