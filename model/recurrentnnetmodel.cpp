@@ -85,6 +85,21 @@ void RecurrentNnetModel::values(Episode *episode, std::vector<float> &rs)
     }
 }
 
+void RecurrentNnetModel::hiddenValues(Episode *episode, std::vector<float> &rs)
+{
+    // Call values(), that takes care of the actual prediction
+    values(episode, rs);
+
+    // The hidden state is simply the output of a "hidden unit" of the network
+    const Vector &o = hiddenNode()->output()->value;
+
+    rs.resize(o.rows());
+
+    for (std::size_t i=0; i<rs.size(); ++i) {
+        rs[i] = o(i);
+    }
+}
+
 void RecurrentNnetModel::learn(const std::vector<Episode *> &episodes)
 {
     std::vector<float> state;

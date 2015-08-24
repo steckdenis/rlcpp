@@ -48,6 +48,19 @@ class AbstractModel
         virtual void values(Episode *episode, std::vector<float> &rs) = 0;
 
         /**
+         * @brief Same as values(), but return a "hidden" state.
+         *
+         * The default implementation simply calls values(). Some models, that
+         * try to uncover the underlying state of a POMDP, can return what they
+         * guess to be the hidden state using this method. Train will still always
+         * be called with observed state values.
+         */
+        virtual void hiddenValues(Episode *episode, std::vector<float> &rs)
+        {
+            values(episode, rs);
+        }
+
+        /**
          * @brief Faster variant of values, used when plotting the model.
          *
          * Some models can do statistics or other things when values() is called,
