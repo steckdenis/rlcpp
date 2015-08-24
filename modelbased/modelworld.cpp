@@ -44,12 +44,13 @@ void ModelWorld::initialState(std::vector<float> &state)
 {
     // Return the same initial state as the one of the wrapped world
     _world->initialState(state);
+    _world_state = state;
 }
 
 void ModelWorld::reset()
 {
     // Fetch the initial state of the world
-    initialState(_world_state);
+    _world->initialState(_world_state);
 
     // Start a new episode
     unsigned int value_size = _world_state.size() + 2;  // Predict state gradient, reward and finished
@@ -123,12 +124,14 @@ void ModelWorld::learn(const std::vector<Episode *> episodes)
 
     // Convert "world episodes" to "model episodes". This conversion basically
     // consists in converting state sequences to state deltas.
-    unsigned int value_size = _world_state.size() + 2;
     std::vector<float> next_state;
     std::vector<float> state;
 
     for (Episode *episode : episodes) {
+        unsigned int value_size = episode->stateSize() + 2;
         Episode *model_episode = new Episode(value_size, value_size, _encoder);
+
+        _values.resize(value_size);
 
         for (unsigned int t = 0; t < episode->length() - 1; ++t) {
             unsigned int action = episode->action(t);

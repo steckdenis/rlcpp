@@ -61,7 +61,7 @@ class ModelWorld : public AbstractWorld
          */
         void learn(const std::vector<Episode *> episodes);
 
-    private:
+    protected:
         /**
          * @brief Encode a world state and an action to a model state (that
          *        contains the action so that the model can predict
