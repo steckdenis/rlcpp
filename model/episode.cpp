@@ -89,6 +89,21 @@ void Episode::setAborted(bool aborted)
     _aborted = aborted;
 }
 
+void Episode::copyValues(const Episode &other)
+{
+    _values = other._values;
+}
+
+void Episode::copyActions(const Episode &other)
+{
+    _actions = other._actions;
+}
+
+void Episode::copyRewards(const Episode &other)
+{
+    _rewards = other._rewards;
+}
+
 unsigned int Episode::stateSize() const
 {
     return _state_size;
@@ -115,7 +130,11 @@ unsigned int Episode::numActions() const
 
 unsigned int Episode::length() const
 {
-    return _states.size() / _state_size;
+    if (_states.size() == 0) {
+        return 0;
+    } else {
+        return _states.size() / _state_size;
+    }
 }
 
 bool Episode::wasAborted() const

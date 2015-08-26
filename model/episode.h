@@ -85,6 +85,17 @@ class Episode
         void setAborted(bool aborted);
 
         /**
+         * @brief Copy the values from another episode
+         *
+         * This can be used if two episodes have to keep their values in sync
+         * even if their states are not the same (when translating state representations
+         * is needed for instance).
+         */
+        void copyValues(const Episode &other);
+        void copyActions(const Episode &other);
+        void copyRewards(const Episode &other);
+
+        /**
          * @brief Number of floating-point variables in an unencoded state observation
          */
         unsigned int stateSize() const;

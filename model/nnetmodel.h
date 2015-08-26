@@ -57,6 +57,7 @@ class NnetModel : public AbstractModel
 
         static void vectorToVector(const std::vector<float> &stl, Vector &eigen);
         static void vectorToCol(const std::vector<float> &stl, Matrix &matrix, int col);
+        static void getNodeOutput(AbstractNode *node, std::vector<float> &rs);
 
     private:
         Network *_network;

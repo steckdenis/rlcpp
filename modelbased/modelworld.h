@@ -39,8 +39,13 @@ class ModelWorld : public AbstractWorld
          * @param encoder Encoder to use to encode the states of the world. For
          *                instance, neural networks work best when states are
          *                normalized or one-hot encoded.
+         * @param reset_real_world True if the real world has to be reset every time
+         *                         reset() is called.
          */
-        ModelWorld(AbstractWorld *world, AbstractModel *model, Episode::Encoder encoder);
+        ModelWorld(AbstractWorld *world,
+                   AbstractModel *model,
+                   Episode::Encoder encoder,
+                   bool reset_real_world);
         ~ModelWorld();
 
         virtual void initialState(std::vector<float> &state);
@@ -52,6 +57,16 @@ class ModelWorld : public AbstractWorld
         virtual void stepSupervised(unsigned int action,
                                     const std::vector<float> &target_state,
                                     float reward);
+
+        /**
+         * @brief State representation of the current state of the world.
+         *
+         * This method returns an undefined (but properly sized) result if step()
+         * or stepSupervised() were never called.
+         *
+         * @sa AbstractModel::hiddenValues()
+         */
+        void lastHiddenValues(std::vector<float> &rs);
 
         /**
          * @brief Use a list of episodes in order to learn the model of the world
@@ -75,6 +90,7 @@ class ModelWorld : public AbstractWorld
         AbstractWorld *_world;
         AbstractModel *_model;
         Episode::Encoder _encoder;
+        bool _reset_real_world;
 
         Episode *_episode;
 

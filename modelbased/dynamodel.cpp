@@ -32,7 +32,7 @@ DynaModel::DynaModel(AbstractWorld *world,
                      unsigned int rollout_length,
                      unsigned int num_rollouts,
                      Episode::Encoder encoder)
-: _world(new ModelWorld(world, world_model, encoder)),
+: _world(new ModelWorld(world, world_model, encoder, false)),
   _model(values_model),
   _learning(learning),
   _encoder(encoder),

@@ -24,11 +24,15 @@
 #include "model/episode.h"
 #include "model/abstractmodel.h"
 
-ModelWorld::ModelWorld(AbstractWorld *world, AbstractModel *model, Episode::Encoder encoder)
+ModelWorld::ModelWorld(AbstractWorld *world,
+                       AbstractModel *model,
+                       Episode::Encoder encoder,
+                       bool reset_real_world)
 : AbstractWorld(world->numActions()),
   _world(world),
   _model(model),
   _encoder(encoder),
+  _reset_real_world(reset_real_world),
   _episode(nullptr)
 {
 }
@@ -49,6 +53,10 @@ void ModelWorld::initialState(std::vector<float> &state)
 
 void ModelWorld::reset()
 {
+    if (_reset_real_world) {
+        _world->reset();
+    }
+
     // Fetch the initial state of the world
     _world->initialState(_world_state);
 
@@ -91,6 +99,25 @@ void ModelWorld::step(unsigned int action,
     // And complete the episode
     _episode->addReward(reward);
     _episode->addValues(_values);
+}
+
+void ModelWorld::lastHiddenValues(std::vector<float> &rs)
+{
+    if (_episode->length() > 0) {
+        // _episode ends at the last state (the current one is still in _world_state),
+        // and its hidden values are what we are looking for
+        _model->hiddenValues(_episode, rs);
+    } else {
+        // Make a dummy episode that allows to get the size of the hidden values
+        unsigned int value_size = _world_state.size() + 2;
+        Episode dummy(value_size, value_size, _encoder);
+
+        makeModelState(_world_state, 0, _model_state);
+        dummy.addState(_model_state);
+        dummy.addAction(0);
+
+        _model->hiddenValues(&dummy, rs);
+    }
 }
 
 void ModelWorld::stepSupervised(unsigned int action,

@@ -129,3 +129,14 @@ void NnetModel::vectorToCol(const std::vector<float> &stl, Matrix &matrix, int c
         matrix(i, col) = stl[i];
     }
 }
+
+void NnetModel::getNodeOutput(AbstractNode *node, std::vector<float> &rs)
+{
+    const Vector &o = node->output()->value;
+
+    rs.resize(o.rows());
+
+    for (std::size_t i=0; i<rs.size(); ++i) {
+        rs[i] = o(i);
+    }
+}

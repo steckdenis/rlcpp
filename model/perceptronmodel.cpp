@@ -30,23 +30,32 @@ PerceptronModel::PerceptronModel(unsigned int hidden_neurons, bool mask_actions)
 : NnetModel(mask_actions),
   _hidden_neurons(hidden_neurons)
 {
+    _hidden_activation = new TanhActivation;
 }
 
 Network *PerceptronModel::createNetwork(Episode *first_episode) const
 {
     Network *network = new Network(first_episode->encodedStateSize());
 
-    Dense *dense1 = new Dense(_hidden_neurons, 1e-2);
-    TanhActivation *dense1_act = new TanhActivation;
+    Dense *hidden = new Dense(_hidden_neurons, 1e-2);
     Dense *dense2 = new Dense(first_episode->valueSize(), 1e-2);
 
-    dense1->setInput(network->inputPort());
-    dense1_act->setInput(dense1->output());
-    dense2->setInput(dense1_act->output());
+    hidden->setInput(network->inputPort());
+    _hidden_activation->setInput(hidden->output());
+    dense2->setInput(_hidden_activation->output());
 
-    network->addNode(dense1);
-    network->addNode(dense1_act);
+    network->addNode(hidden);
+    network->addNode(_hidden_activation);
     network->addNode(dense2);
 
     return network;
+}
+
+void PerceptronModel::hiddenValues(Episode *episode, std::vector<float> &rs)
+{
+    // Call values(), that takes care of the actual prediction
+    values(episode, rs);
+
+    // The hidden state is the output of the hidden layer
+    NnetModel::getNodeOutput(_hidden_activation, rs);
 }

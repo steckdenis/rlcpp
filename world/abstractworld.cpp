@@ -230,7 +230,13 @@ void AbstractWorld::plotModel(AbstractModel *model, Episode::Encoder encoder)
                 state[1] = y;
             }
 
-            episode.addState(state);
+            // Repeatedly add the state, so that recurrent models and HiddenModel
+            // can see a sequence, fill-up their caches and statistics, etc.
+            for (int i=0; i<5; ++i) {
+                episode.addState(state);
+                episode.addAction(0);
+                episode.addReward(0.0f);
+            }
 
             // Query the values from the model
             model->nextEpisode();

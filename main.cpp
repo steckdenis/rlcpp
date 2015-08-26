@@ -35,6 +35,7 @@
 #include "world/polargridworld.h"
 #include "world/scaleworld.h"
 #include "modelbased/dynamodel.h"
+#include "modelbased/hiddenmodel.h"
 
 #ifdef ROSCPP_FOUND
     #include "world/rosworld.h"
@@ -198,7 +199,7 @@ int main(int argc, char **argv) {
             learning = new EGreedyLearning(learning, 0.2);
         } else if (arg == "dyna") {
             if (world == nullptr || model == nullptr || learning == nullptr) {
-                std::cerr << "texplore can be used only after a world, a model and a learning algorithm" << std::endl;
+                std::cerr << "dyna can be used only after a world, a model and a learning algorithm" << std::endl;
                 return 1;
             }
 
@@ -211,6 +212,18 @@ int main(int argc, char **argv) {
                 rollout_length,
                 num_rollouts,
                 encoder
+            );
+        } else if (arg == "simplehidden") {
+            if (world == nullptr || model == nullptr) {
+                std::cerr << "Put simplehidden after the world and the model to be wrapped" << std::endl;
+                return 1;
+            }
+
+            batch_size = 1;
+            model = new HiddenModel(
+                world,
+                world_model,
+                model
             );
         }
     }
