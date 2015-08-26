@@ -24,6 +24,7 @@
 
 #include <algorithm>
 #include <numeric>
+#include <assert.h>
 
 template<typename T>
 void extend(std::vector<T> &dest, const std::vector<T> &src)
@@ -71,6 +72,7 @@ void Episode::addState(const std::vector<float> &state)
 
 void Episode::addValues(const std::vector<float> &values)
 {
+    assert(values.size() == _value_size);
     extend(_values, values);
 }
 

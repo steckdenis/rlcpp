@@ -104,7 +104,7 @@ int main(int argc, char **argv) {
     AbstractModel *model = nullptr;
     AbstractModel *world_model = nullptr;
     AbstractLearning *learning = nullptr;
-    AbstractLearning *base_learning = nullptr;  // Learning without Softmax or EGreedy
+    AbstractLearning *rollout_learning = nullptr;
     Episode::Encoder encoder = nullptr;
     bool random_initial = false;
 
@@ -172,16 +172,15 @@ int main(int argc, char **argv) {
             world_model = new StackedLSTMModel(hidden_neurons);
         } else if (arg == "qlearning") {
             learning = new QLearning(discount_factor, learning_factor);
-            base_learning = learning;
         } else if (arg == "advantage") {
             learning = new AdvantageLearning(discount_factor, learning_factor, 0.5);
-            base_learning = learning;
         } else if (arg == "softmax") {
             if (learning == nullptr) {
                 std::cerr << "Put softmax after the learning algorithm to be filtered" << std::endl;
                 return 1;
             }
 
+            rollout_learning = new SoftmaxLearning(learning, 3.0f);
             learning = new SoftmaxLearning(learning, 0.5);
         } else if (arg == "adaptivesoftmax") {
             if (learning == nullptr) {
@@ -189,6 +188,7 @@ int main(int argc, char **argv) {
                 return 1;
             }
 
+            rollout_learning = new AdaptiveSoftmaxLearning(learning, 0.4);
             learning = new AdaptiveSoftmaxLearning(learning, 0.2);
         } else if (arg == "egreedy") {
             if (learning == nullptr) {
@@ -196,9 +196,10 @@ int main(int argc, char **argv) {
                 return 1;
             }
 
+            rollout_learning = new EGreedyLearning(learning, 0.6);
             learning = new EGreedyLearning(learning, 0.2);
         } else if (arg == "dyna") {
-            if (world == nullptr || model == nullptr || learning == nullptr) {
+            if (world == nullptr || model == nullptr || rollout_learning == nullptr) {
                 std::cerr << "dyna can be used only after a world, a model and a learning algorithm" << std::endl;
                 return 1;
             }
@@ -207,7 +208,7 @@ int main(int argc, char **argv) {
                 world,
                 world_model,
                 model,
-                new SoftmaxLearning(base_learning, 30.0f),   // Great amount of exploration in Dyna rollouts
+                rollout_learning,
                 rollout_length,
                 num_rollouts,
                 encoder
@@ -227,7 +228,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    if (world == nullptr || model == nullptr || learning == nullptr) {
+    if (world == nullptr || model == nullptr || rollout_learning == nullptr) {
         std::cerr << "You have to provide a world, a model and a learning algorithm" << std::endl;
         return 1;
     }
@@ -250,5 +251,6 @@ int main(int argc, char **argv) {
     delete model;
     delete world_model;
     delete learning;
+    delete rollout_learning;
     delete world;
 }

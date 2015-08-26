@@ -58,6 +58,10 @@ void DynaModel::values(Episode *episode, std::vector<float> &rs)
         for (Episode *e : episodes) {
             delete e;   // Don't leak the rollout episodes
         }
+
+        // The rollouts have been performed on _model, that will now see
+        // the "real" episode. Inform it that a new episode is coming
+        _model->nextEpisode();
     }
 
     // Use the model trained by the rollouts to predict the values
