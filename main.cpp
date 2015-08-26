@@ -55,7 +55,7 @@ unsigned int num_episodes = 5000;
 unsigned int max_timesteps = 1000;
 unsigned int hidden_neurons = 50;
 unsigned int batch_size = 10;
-unsigned int rollout_length = 10;
+unsigned int rollout_length = 1000;
 unsigned int num_rollouts = 1;
 float discount_factor = 0.9f;
 float learning_factor = 0.2f;
@@ -203,12 +203,11 @@ int main(int argc, char **argv) {
                 return 1;
             }
 
-            batch_size = 1;
             model = new DynaModel(
                 world,
                 world_model,
                 model,
-                new SoftmaxLearning(base_learning, 3.0f),   // Great amount of exploration in TEXPLORE rollouts
+                new SoftmaxLearning(base_learning, 30.0f),   // Great amount of exploration in Dyna rollouts
                 rollout_length,
                 num_rollouts,
                 encoder
