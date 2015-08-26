@@ -23,9 +23,8 @@
 #include "nnetmodel.h"
 #include "episode.h"
 
-NnetModel::NnetModel(bool mask_actions)
-: _network(nullptr),
-  _mask_actions(mask_actions)
+NnetModel::NnetModel()
+: _network(nullptr)
 {
 }
 
@@ -74,7 +73,6 @@ void NnetModel::learn(const std::vector<Episode *> &episodes)
 
     Eigen::MatrixXf inputs(episodes[0]->encodedStateSize(), total_size);
     Eigen::MatrixXf outputs(episodes[0]->valueSize(), total_size);
-    Eigen::MatrixXf weights(episodes[0]->valueSize(), total_size);
 
     // Fill this matrix
     int index = 0;
@@ -87,31 +85,18 @@ void NnetModel::learn(const std::vector<Episode *> &episodes)
 
         // Learn all the values obtained during the episode
         for (unsigned int t=0; t < episode->length() - 1; ++t) {
-            unsigned int action = episode->action(t);
-
             episode->encodedState(t, state);
             episode->values(t, values);
 
             vectorToCol(state, inputs, index);
             vectorToCol(values, outputs, index);
 
-            if (_mask_actions) {
-                // Use only the value associated with the action that has been taken
-                // when computing the errors
-                weights.col(index).setZero();
-                weights(action, index) = 1.0f;
-            }
-
             ++index;
         }
     }
 
     // Train the network on that data
-    if (_mask_actions) {
-        _network->train(inputs, outputs, weights, 10, 4);
-    } else {
-        _network->train(inputs, outputs, 10, 4);
-    }
+    _network->train(inputs, outputs, 10, 4);
 }
 
 void NnetModel::vectorToVector(const std::vector<float> &stl, Vector &eigen)

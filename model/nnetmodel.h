@@ -38,12 +38,7 @@
 class NnetModel : public AbstractModel
 {
     public:
-        /**
-         * @param mask_actions Mask actions (don't update their values) that have
-         *                     not been taken at a given time step.
-         *                     See PerceptronModel::PerceptronModel
-         */
-        NnetModel(bool mask_actions);
+        NnetModel();
         virtual ~NnetModel();
 
         virtual void values(Episode *episode, std::vector<float> &rs);
@@ -61,7 +56,6 @@ class NnetModel : public AbstractModel
 
     private:
         Network *_network;
-        bool _mask_actions;
 };
 
 #endif

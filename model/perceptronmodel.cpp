@@ -26,9 +26,8 @@
 #include <nnetcpp/dense.h>
 #include <nnetcpp/activation.h>
 
-PerceptronModel::PerceptronModel(unsigned int hidden_neurons, bool mask_actions)
-: NnetModel(mask_actions),
-  _hidden_neurons(hidden_neurons)
+PerceptronModel::PerceptronModel(unsigned int hidden_neurons)
+: _hidden_neurons(hidden_neurons)
 {
     _hidden_activation = new TanhActivation;
 }

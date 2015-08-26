@@ -162,8 +162,8 @@ int main(int argc, char **argv) {
             model = new GaussianMixtureModel(0.60, 0.20, 0.05, true);
             world_model = new GaussianMixtureModel(0.60, 0.20, 0.05, false);
         } else if (arg == "perceptron") {
-            model = new PerceptronModel(hidden_neurons, true);
-            world_model = new PerceptronModel(hidden_neurons, false);
+            model = new PerceptronModel(hidden_neurons);
+            world_model = new PerceptronModel(hidden_neurons);
         } else if (arg == "stackedgru") {
             model = new StackedGRUModel(hidden_neurons);
             world_model = new StackedGRUModel(hidden_neurons);

@@ -37,11 +37,8 @@ class PerceptronModel : public NnetModel
          * @brief Constructor.
          *
          * @param hidden_neurons Number of neurons in the hidden layers
-         * @param mask_actions Only update values associated with actions that have
-         *                     been taken (if true). If false, all the values in
-         *                     the episodes are used for learning.
          */
-        PerceptronModel(unsigned int hidden_neurons, bool mask_actions);
+        PerceptronModel(unsigned int hidden_neurons);
 
         virtual Network *createNetwork(Episode *first_episode) const;
         virtual void hiddenValues(Episode *episode, std::vector<float> &rs);
