@@ -37,24 +37,27 @@ DynaModel::DynaModel(AbstractWorld *world,
   _learning(learning),
   _encoder(encoder),
   _rollout_length(rollout_length),
-  _num_rollouts(num_rollouts)
+  _num_rollouts(num_rollouts),
+  _enable_rollouts(false)
 {
 }
 
 void DynaModel::values(Episode *episode, std::vector<float> &rs)
 {
-    // Perform some rollouts from the current state
-    std::vector<Episode *> episodes = _world->run(_model,
-                                                  _learning,
-                                                  _num_rollouts,
-                                                  _rollout_length,
-                                                  _num_rollouts,
-                                                  _encoder,
-                                                  false,
-                                                  episode);
+    if (_enable_rollouts) {
+        // Perform some rollouts from the current state
+        std::vector<Episode *> episodes = _world->run(_model,
+                                                      _learning,
+                                                      _num_rollouts,
+                                                      _rollout_length,
+                                                      _num_rollouts,
+                                                      _encoder,
+                                                      false,
+                                                      episode);
 
-    for (Episode *e : episodes) {
-        delete e;   // Don't leak the rollout episodes
+        for (Episode *e : episodes) {
+            delete e;   // Don't leak the rollout episodes
+        }
     }
 
     // Use the model trained by the rollouts to predict the values
@@ -70,6 +73,9 @@ void DynaModel::learn(const std::vector<Episode *> &episodes)
 {
     _model->learn(episodes);
     _world->learn(episodes);
+
+    // Enable the rollouts now that the model has had a chance to learn something
+    _enable_rollouts = true;
 }
 
 void DynaModel::nextEpisode()

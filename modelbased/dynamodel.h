@@ -75,6 +75,7 @@ class DynaModel : public AbstractModel
         Episode::Encoder _encoder;
         unsigned int _rollout_length;
         unsigned int _num_rollouts;
+        bool _enable_rollouts;
 };
 
 #endif
