@@ -93,7 +93,7 @@ void ModelWorld::step(unsigned int action,
 
     // Update the output parameters
     reward = _values[state_size];
-    finished = (_values[state_size + 1] > 0.5f);
+    finished = (_values[state_size + 1] > 0.0f);
     state = _world_state;
 
     // And complete the episode
@@ -182,7 +182,7 @@ void ModelWorld::learn(const std::vector<Episode *> episodes)
             }
 
             _values[value_size - 2] = reward;
-            _values[value_size - 1] = (finished ? 1.0f : 0.0f);
+            _values[value_size - 1] = (finished ? 1.0f : -1.0f);
 
             // Add the state delta and expected prediction to the model episode
             makeModelState(state, action, _model_state);
@@ -191,14 +191,21 @@ void ModelWorld::learn(const std::vector<Episode *> episodes)
             model_episode->addAction(action);
             model_episode->addReward(reward);
             model_episode->addValues(_values);
-            model_episode->setAborted(episode->wasAborted());
         }
+
+        // Duplicate the last state and action, because the models tend to ignore
+        // the last state-value pair (because it does not have an action)
+        model_episode->addState(_model_state);
+        model_episode->addValues(_values);
+        model_episode->setAborted(episode->wasAborted());
 
         model_episodes.push_back(model_episode);
     }
 
     // Train the model on the new episodes
-    _model->learn(model_episodes);
+    for (int i=0; i<10; ++i) {
+        _model->learn(model_episodes);
+    }
 
     for (Episode *episode : model_episodes) {
         delete episode;
