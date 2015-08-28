@@ -124,10 +124,7 @@ void HiddenModel::learn(const std::vector<Episode *> &episodes)
     }
 
     _model->learn(_model_episodes);
-}
 
-void HiddenModel::nextEpisode()
-{
     // Clear the old list of episodes and start afresh
     for (Episode *e : _model_episodes) {
         delete e;
