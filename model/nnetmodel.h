@@ -43,6 +43,7 @@ class NnetModel : public AbstractModel
 
         virtual void values(Episode *episode, std::vector<float> &rs);
         virtual void learn(const std::vector<Episode *> &episodes);
+        virtual void swapModels();
 
         /**
          * @brief Create a neural network having a number of input and output
@@ -56,6 +57,7 @@ class NnetModel : public AbstractModel
 
     private:
         Network *_network;
+        Network *_learn_network;
 };
 
 #endif

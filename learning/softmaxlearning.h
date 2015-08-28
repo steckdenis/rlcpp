@@ -36,7 +36,6 @@ class SoftmaxLearning : public AbstractLearning
          * @param temperature The higher this is, the more exploration there is
          */
         SoftmaxLearning(AbstractLearning *learning, float temperature);
-        virtual ~SoftmaxLearning();
 
         virtual void actions(Episode *episode, std::vector<float> &probabilities, float &td_error);
 

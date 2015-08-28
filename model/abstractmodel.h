@@ -65,7 +65,7 @@ class AbstractModel
          * learn() | values()
          * @endcode
          */
-        virtual void swapModels() {};
+        virtual void swapModels() = 0;
 
         /**
          * @brief Faster variant of values, used when plotting the model.

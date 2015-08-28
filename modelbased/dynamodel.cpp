@@ -34,6 +34,7 @@ DynaModel::DynaModel(AbstractWorld *world,
                      Episode::Encoder encoder)
 : _world(new ModelWorld(world, world_model, encoder, false)),
   _model(values_model),
+  _world_model(world_model),
   _learning(learning),
   _encoder(encoder),
   _rollout_length(rollout_length),
@@ -80,6 +81,13 @@ void DynaModel::learn(const std::vector<Episode *> &episodes)
 
     // Enable the rollouts now that the model has had a chance to learn something
     _enable_rollouts = true;
+}
+
+void DynaModel::swapModels()
+{
+    // Swap the world and value models
+    _model->swapModels();
+    _world_model->swapModels();
 }
 
 void DynaModel::nextEpisode()

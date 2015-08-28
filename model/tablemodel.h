@@ -7,10 +7,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -38,6 +38,7 @@ class TableModel : public AbstractModel
     public:
         virtual void values(Episode *episode, std::vector<float> &rs);
         virtual void learn(const std::vector<Episode *> &episodes);
+        virtual void swapModels();
 
     private:
         struct v_hash
@@ -50,7 +51,10 @@ class TableModel : public AbstractModel
             bool operator()(const std::vector<float> &a, const std::vector<float> &b) const;
         };
 
-        std::unordered_map<std::vector<float>, std::vector<float>, v_hash, v_equal> _table;
+        typedef std::unordered_map<std::vector<float>, std::vector<float>, v_hash, v_equal> Table;
+
+        Table _table;
+        Table _learn_table;
 };
 
 #endif

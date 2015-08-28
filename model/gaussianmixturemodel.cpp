@@ -42,6 +42,21 @@ GaussianMixtureModel::~GaussianMixtureModel()
     for (GaussianMixture *model : _models) {
         delete model;
     }
+
+    for (GaussianMixture *model : _learn_models) {
+        delete model;
+    }
+}
+
+void GaussianMixtureModel::swapModels()
+{
+    // Delete the models, as they will be replaced
+    for (GaussianMixture *model : _models) {
+        delete model;
+    }
+
+    _models = _learn_models;
+    _learn_models.clear();
 }
 
 void GaussianMixtureModel::values(Episode *episode, std::vector<float> &rs)
@@ -75,9 +90,15 @@ void GaussianMixtureModel::learn(const std::vector<Episode *> &episodes)
         Eigen::VectorXf input(episode->stateSize());
 
         // Create the models if needed
-        if (_models.size() == 0) {
+        if (_learn_models.size() == 0) {
             for (unsigned int a=0; a<episode->valueSize(); ++a) {
-                _models.push_back(new GaussianMixture(_var_initial, _novelty));
+                if (_models.size() == 0) {
+                    // Completely new model, first time learn() is called
+                    _learn_models.push_back(new GaussianMixture(_var_initial, _novelty));
+                } else {
+                    // Copy an existing model
+                    _learn_models.push_back(new GaussianMixture(*_models[a]));
+                }
             }
         }
 
@@ -92,11 +113,11 @@ void GaussianMixtureModel::learn(const std::vector<Episode *> &episodes)
 
             if (_mask_actions) {
                 // Update the model of the selected action
-                _models[action]->setValue(input, values[action]);
+                _learn_models[action]->setValue(input, values[action]);
             } else {
                 // Update all the models
                 for (unsigned int a=0; a<episode->valueSize(); ++a) {
-                    _models[a]->setValue(input, values[a]);
+                    _learn_models[a]->setValue(input, values[a]);
                 }
             }
         }
@@ -105,7 +126,7 @@ void GaussianMixtureModel::learn(const std::vector<Episode *> &episodes)
     // Print the number of clusters in the models
     std::cout << "[Gaussian mixture model] Number of clusters:";
 
-    for (GaussianMixture *model : _models) {
+    for (GaussianMixture *model : _learn_models) {
         std::cout << ' ' << model->numberOfClusters();
     }
 

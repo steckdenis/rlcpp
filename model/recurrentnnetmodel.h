@@ -42,6 +42,7 @@ class RecurrentNnetModel : public AbstractModel
 
         virtual void values(Episode *episode, std::vector<float> &rs);
         virtual void learn(const std::vector<Episode *> &episodes);
+        virtual void swapModels();
         virtual void nextEpisode();
 
         /**
@@ -52,6 +53,8 @@ class RecurrentNnetModel : public AbstractModel
 
     private:
         Network *_network;
+        Network *_learn_network;
+
         unsigned int _last_episode_length;
 };
 

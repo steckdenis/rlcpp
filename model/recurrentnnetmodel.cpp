@@ -24,8 +24,11 @@
 #include "nnetmodel.h"
 #include "episode.h"
 
+#include <nnetcpp/networkserializer.h>
+
 RecurrentNnetModel::RecurrentNnetModel()
 : _network(nullptr),
+  _learn_network(nullptr),
   _last_episode_length(0)
 {
 }
@@ -34,6 +37,10 @@ RecurrentNnetModel::~RecurrentNnetModel()
 {
     if (_network) {
         delete _network;
+    }
+
+    if (_learn_network) {
+        delete _learn_network;
     }
 }
 
@@ -46,6 +53,12 @@ void RecurrentNnetModel::nextEpisode()
         _network->reset();
     }
 }
+
+void RecurrentNnetModel::swapModels()
+{
+    std::swap(_network, _learn_network);
+}
+
 
 void RecurrentNnetModel::values(Episode *episode, std::vector<float> &rs)
 {
@@ -90,15 +103,23 @@ void RecurrentNnetModel::learn(const std::vector<Episode *> &episodes)
     std::vector<float> state;
     std::vector<float> values;
 
+    // If some learning already happend, copy the weights of _network (latest
+    // network) to _learn_network (network that will be trained)
+    if (!_learn_network) {
+        _learn_network = createNetwork(episodes[0]);
+    }
+
+    if (_network) {
+        NetworkSerializer serializer;
+
+        _network->serialize(serializer);
+        _learn_network->deserialize(serializer);
+    }
+
     // Learn all the episodes separately, because they represent sequences
     // of observations that must be kept in order
     for (int i=0; i<50; ++i) {
         for (Episode *episode : episodes) {
-            // Create the network if needed
-            if (!_network) {
-                _network = createNetwork(episode);
-            }
-
             // Learn all the values obtained during the episode
             unsigned int size = episode->length() - 1;
 
@@ -114,7 +135,7 @@ void RecurrentNnetModel::learn(const std::vector<Episode *> &episodes)
             }
 
             // Train the network on that data
-            _network->trainSequence(inputs, outputs, 1);
+            _learn_network->trainSequence(inputs, outputs, 1);
         }
     }
 }

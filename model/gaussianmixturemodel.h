@@ -54,6 +54,7 @@ class GaussianMixtureModel : public AbstractModel
 
         virtual void values(Episode *episode, std::vector<float> &rs);
         virtual void learn(const std::vector<Episode *> &episodes);
+        virtual void swapModels();
 
     private:
         void vectorToVectorXf(const std::vector<float> &stl, Eigen::VectorXf &eigen);
@@ -65,7 +66,9 @@ class GaussianMixtureModel : public AbstractModel
 
         std::normal_distribution<float> _noise_distribution;
         std::default_random_engine _random_engine;
+
         std::vector<GaussianMixture *> _models;     /*!< @brief One model per action */
+        std::vector<GaussianMixture *> _learn_models;
 };
 
 #endif

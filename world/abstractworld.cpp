@@ -170,7 +170,7 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
         // Tell the episode whether it has been aborted or has reached the goal
         episode->setAborted(!finished);
 
-        // If a batch has been finished, update the model
+        // If a batch has been finished, update the model and "swap" it
         episodes.push_back(episode);
         learn_episodes.push_back(episode);
 
@@ -180,6 +180,7 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
             if (verbose) std::cout << "Learning..." << std::flush;
 
             model->learn(learn_episodes);
+            model->swapModels();
             learn_episodes.clear();
 
             if (verbose) std::cout << "done" << std::endl;

@@ -33,11 +33,6 @@ SoftmaxLearning::SoftmaxLearning(AbstractLearning *learning, float temperature)
 {
 }
 
-SoftmaxLearning::~SoftmaxLearning()
-{
-    delete _learning;
-}
-
 void SoftmaxLearning::actions(Episode *episode, std::vector<float> &probabilities, float &td_error)
 {
     // Let the wrapped learning algorithm compute the premilinary values

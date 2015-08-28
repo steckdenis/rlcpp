@@ -23,8 +23,11 @@
 #include "nnetmodel.h"
 #include "episode.h"
 
+#include <nnetcpp/networkserializer.h>
+
 NnetModel::NnetModel()
-: _network(nullptr)
+: _network(nullptr),
+  _learn_network(nullptr)
 {
 }
 
@@ -33,6 +36,16 @@ NnetModel::~NnetModel()
     if (_network) {
         delete _network;
     }
+
+    if (_learn_network) {
+        delete _learn_network;
+    }
+}
+
+void NnetModel::swapModels()
+{
+    // Swap the learning and prediction networks
+    std::swap(_network, _learn_network);
 }
 
 void NnetModel::values(Episode *episode, std::vector<float> &rs)
@@ -64,6 +77,19 @@ void NnetModel::learn(const std::vector<Episode *> &episodes)
     std::vector<float> state;
     std::vector<float> values;
 
+    // If some learning already happend, copy the weights of _network (latest
+    // network) to _learn_network (network that will be trained)
+    if (!_learn_network) {
+        _learn_network = createNetwork(episodes[0]);
+    }
+
+    if (_network) {
+        NetworkSerializer serializer;
+
+        _network->serialize(serializer);
+        _learn_network->deserialize(serializer);
+    }
+
     // Create a big matrix with one column per input/output pair
     std::size_t total_size = 0;
 
@@ -78,11 +104,6 @@ void NnetModel::learn(const std::vector<Episode *> &episodes)
     int index = 0;
 
     for (Episode *episode : episodes) {
-        // Create the network if needed
-        if (!_network) {
-            _network = createNetwork(episode);
-        }
-
         // Learn all the values obtained during the episode
         for (unsigned int t=0; t < episode->length() - 1; ++t) {
             episode->encodedState(t, state);
@@ -96,7 +117,7 @@ void NnetModel::learn(const std::vector<Episode *> &episodes)
     }
 
     // Train the network on that data
-    _network->train(inputs, outputs, 10, 4);
+    _learn_network->train(inputs, outputs, 10, 4);
 }
 
 void NnetModel::vectorToVector(const std::vector<float> &stl, Vector &eigen)

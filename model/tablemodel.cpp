@@ -7,10 +7,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -25,6 +25,12 @@
 
 #include <algorithm>
 #include <iostream>
+
+void TableModel::swapModels()
+{
+    // Copy the learning table to the prediction table
+    _table = _learn_table;
+}
 
 void TableModel::values(Episode *episode, std::vector<float> &rs)
 {
@@ -46,6 +52,10 @@ void TableModel::learn(const std::vector<Episode *> &episodes)
     std::vector<float> state;
     std::vector<float> values;
 
+    // Copy the prediction table to the learning table so that learning occurs
+    // on an up-do-date table
+    _learn_table = _table;
+
     for (Episode *episode : episodes) {
         for (unsigned int t=0; t < episode->length() - 1; ++t) {
             unsigned int action = episode->action(t);
@@ -55,10 +65,10 @@ void TableModel::learn(const std::vector<Episode *> &episodes)
 
             // Update the value associated to the action that was taken, or
             // populate the table if this state was never encountered.
-            auto it = _table.find(state);
+            auto it = _learn_table.find(state);
 
-            if (it == _table.end()) {
-                _table[state] = values;
+            if (it == _learn_table.end()) {
+                _learn_table[state] = values;
             } else {
                 it->second[action] = values[action];
             }
