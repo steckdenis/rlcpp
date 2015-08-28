@@ -24,36 +24,23 @@
 
 #include <algorithm>
 
-QLearning::QLearning(float discount_factor, float learning_rate)
-: _discount_factor(discount_factor),
-  _learning_rate(learning_rate)
+QLearning::QLearning(float discount_factor, float eligibility_factor, float learning_rate)
+: AbstractTDLearning(discount_factor, eligibility_factor, learning_rate)
 {
 }
 
-
-void QLearning::actions(Episode *episode, std::vector<float> &probabilities, float &td_error)
+float QLearning::tdError(const Episode *episode, unsigned int timestep)
 {
-    // Update the Q-value of the last action that was taken
-    std::vector<float> &current_values = probabilities;             // Reuse temporary vectors
+    unsigned int last_action = episode->action(timestep - 1);
+    float last_reward = episode->reward(timestep - 1);
 
-    if (episode->length() >= 2) {
-        unsigned int last_t = episode->length() - 2;
-        unsigned int last_action = episode->action(last_t);
-        float last_reward = episode->reward(last_t);
+    episode->values(timestep - 1, _last_values);
+    episode->values(timestep, _current_values);
 
-        episode->values(last_t, _last_values);
-        episode->values(last_t + 1, current_values);
+    float Q = _last_values[last_action];
 
-        float Q = _last_values[last_action];
-        td_error =
-            last_reward +
-            _discount_factor * *std::max_element(current_values.begin(), current_values.end())
-            - Q;
-
-        episode->updateValue(last_t, last_action, Q + _learning_rate * td_error);
-    }
-
-    // probabilities (alias current_values) contains the values of the last state
-    // in the episode. Truncate it to the number of actions.
-    probabilities.resize(episode->numActions());
+    return
+        last_reward +
+        _discount_factor * *std::max_element(_current_values.begin(), _current_values.end())
+        - Q;
 }

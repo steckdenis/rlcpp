@@ -58,6 +58,7 @@ unsigned int batch_size = 10;
 unsigned int rollout_length = 1000;
 unsigned int num_rollouts = 1;
 float discount_factor = 0.9f;
+float eligibility_factor = 0.9f;
 float learning_factor = 0.2f;
 
 /**
@@ -171,9 +172,9 @@ int main(int argc, char **argv) {
             model = new StackedLSTMModel(hidden_neurons);
             world_model = new StackedLSTMModel(hidden_neurons);
         } else if (arg == "qlearning") {
-            learning = new QLearning(discount_factor, learning_factor);
+            learning = new QLearning(discount_factor, eligibility_factor, learning_factor);
         } else if (arg == "advantage") {
-            learning = new AdvantageLearning(discount_factor, learning_factor, 0.5);
+            learning = new AdvantageLearning(discount_factor, eligibility_factor, learning_factor, 0.5);
         } else if (arg == "softmax") {
             if (learning == nullptr) {
                 std::cerr << "Put softmax after the learning algorithm to be filtered" << std::endl;

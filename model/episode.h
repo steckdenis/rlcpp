@@ -146,6 +146,11 @@ class Episode
         void values(unsigned int t, std::vector<float> &rs) const;
 
         /**
+         * @brief Add a value to the value of an action
+         */
+        void addValue(unsigned int t, unsigned int action, float value);
+
+        /**
          * @brief Update the value of an action
          */
         void updateValue(unsigned int t, unsigned int action, float value);

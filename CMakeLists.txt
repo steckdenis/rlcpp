@@ -19,6 +19,7 @@ set(SOURCES
     model/recurrentnnetmodel.cpp
     model/stackedgrumodel.cpp
     model/stackedlstmmodel.cpp
+    learning/abstracttdlearning.cpp
     learning/qlearning.cpp
     learning/advantagelearning.cpp
     learning/softmaxlearning.cpp

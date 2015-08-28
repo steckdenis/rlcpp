@@ -25,41 +25,26 @@
 #include <algorithm>
 #include <iostream>
 
-AdvantageLearning::AdvantageLearning(float discount_factor, float learning_rate, float kappa)
-: _discount_factor(discount_factor),
-  _learning_rate(learning_rate),
+AdvantageLearning::AdvantageLearning(float discount_factor, float eligibility_factor, float learning_rate, float kappa)
+: AbstractTDLearning(discount_factor, eligibility_factor, learning_rate),
   _inv_kappa(1.0f / kappa)
 {
 }
 
-
-void AdvantageLearning::actions(Episode *episode, std::vector<float> &probabilities, float &td_error)
+float AdvantageLearning::tdError(const Episode *episode, unsigned int timestep)
 {
-    // Update the Q-value of the last action that was taken
-    std::vector<float> &current_values = probabilities;             // Reuse temporary vectors
+    unsigned int last_action = episode->action(timestep - 1);
+    float last_reward = episode->reward(timestep - 1);
 
-    if (episode->length() >= 2) {
-        unsigned int last_t = episode->length() - 2;
-        unsigned int last_action = episode->action(last_t);
-        float last_reward = episode->reward(last_t);
+    episode->values(timestep - 1, _last_values);
+    episode->values(timestep, _current_values);
 
-        episode->values(last_t, _last_values);
-        episode->values(last_t + 1, current_values);
+    float advantage = _last_values[last_action];
+    float last_value = *std::max_element(_last_values.begin(), _last_values.end());
+    float current_value = *std::max_element(_current_values.begin(), _current_values.end());
 
-        float advantage = _last_values[last_action];
-        float last_value = *std::max_element(_last_values.begin(), _last_values.end());
-        float current_value = *std::max_element(current_values.begin(), current_values.end());
-        td_error =
-            last_value +
-            (last_reward + _discount_factor * current_value - last_value) * _inv_kappa -
-            advantage;
-
-        episode->updateValue(last_t, last_action, advantage + _learning_rate * td_error);
-    } else {
-        td_error = 0;
-    }
-
-    // probabilities (alias current_values) contains the values of the last state
-    // in the episode. Truncate it to the number of actions.
-    probabilities.resize(episode->numActions());
+    return
+        last_value +
+        (last_reward + _discount_factor * current_value - last_value) * _inv_kappa -
+        advantage;
 }

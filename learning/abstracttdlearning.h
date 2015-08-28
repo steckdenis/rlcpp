@@ -20,29 +20,38 @@
  * THE SOFTWARE.
  */
 
-#ifndef __QLEARNING_H__
-#define __QLEARNING_H__
+#ifndef __ABSTRACTTDLEARNING_H__
+#define __ABSTRACTTDLEARNING_H__
 
-#include "abstracttdlearning.h"
+#include "abstractlearning.h"
 
 /**
- * @brief Well-known Q-Learning algorithm
+ * @brief Base class for temporal-difference learning
  */
-class QLearning : public AbstractTDLearning
+class AbstractTDLearning : public AbstractLearning
 {
     public:
         /**
          * @param discount_factor Discount factor used when computing cumulative rewards
+         * @param eligbility_factor Discount factor used when computing eligibility traces
          * @param learning_rate Rate at which learning occurs
          */
-        QLearning(float discount_factor, float eligibility_factor, float learning_rate);
+        AbstractTDLearning(float discount_factor, float eligibility_factor, float learning_rate);
 
-        virtual float tdError(const Episode *episode, unsigned int timestep);
+        virtual void actions(Episode *episode, std::vector<float> &probabilities, float &td_error);
 
-    private:
-        // Lists so that memory does not need to be continuously reallocated
-        std::vector<float> _last_values;
-        std::vector<float> _current_values;
+        /**
+         * @brief Compute the temporal-difference error between @p timestep - 1
+         *        and @p timestep.
+         *
+         * @param episode Episode that contains the experiences of the agent
+         */
+        virtual float tdError(const Episode *episode, unsigned int timestep) = 0;
+
+    protected:
+        float _discount_factor;
+        float _eligibility_factor;
+        float _learning_rate;
 };
 
 #endif

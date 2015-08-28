@@ -164,6 +164,11 @@ void Episode::values(unsigned int t, std::vector<float> &rs) const
     extract(_values, _value_size, t, rs);
 }
 
+void Episode::addValue(unsigned int t, unsigned int action, float value)
+{
+    _values[t * _value_size + action] += value;
+}
+
 void Episode::updateValue(unsigned int t, unsigned int action, float value)
 {
     _values[t * _value_size + action] = value;
