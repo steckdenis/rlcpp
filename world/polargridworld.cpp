@@ -33,6 +33,13 @@ PolarGridWorld::PolarGridWorld(unsigned int width,
 {
 }
 
+void PolarGridWorld::reset()
+{
+    GridWorld::reset();
+
+    _direction = (unsigned int)GridWorld::Action::Right;
+}
+
 void PolarGridWorld::step(unsigned int action,
                           bool &finished,
                           float &reward,

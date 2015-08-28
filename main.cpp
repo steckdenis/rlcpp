@@ -165,6 +165,8 @@ int main(int argc, char **argv) {
         } else if (arg == "perceptron") {
             model = new PerceptronModel(hidden_neurons);
             world_model = new PerceptronModel(hidden_neurons);
+
+            eligibility_factor = 0.0f;                          // NOTE: Eligibility traces tend to propagate approximation errors, and thus don't work well with neural networks
         } else if (arg == "stackedgru") {
             model = new StackedGRUModel(hidden_neurons);
             world_model = new StackedGRUModel(hidden_neurons);

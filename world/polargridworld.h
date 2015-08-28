@@ -46,6 +46,7 @@ class PolarGridWorld : public GridWorld
                        Point goal,
                        bool stochastic);
 
+        virtual void reset();
         virtual void step(unsigned int action,
                           bool &finished,
                           float &reward,
