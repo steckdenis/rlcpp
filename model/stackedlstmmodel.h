@@ -39,10 +39,8 @@ class StackedLSTMModel : public RecurrentNnetModel
         StackedLSTMModel(unsigned int hidden_neurons);
 
         virtual Network *createNetwork(Episode *first_episode) const;
-        virtual AbstractNode *hiddenNode() const;
 
     private:
-        LSTM *_lstm;
         unsigned int _hidden_neurons;
 };
 

@@ -41,7 +41,6 @@ class RecurrentNnetModel : public AbstractModel
         virtual ~RecurrentNnetModel();
 
         virtual void values(Episode *episode, std::vector<float> &rs);
-        virtual void hiddenValues(Episode *episode, std::vector<float> &rs);
         virtual void learn(const std::vector<Episode *> &episodes);
         virtual void nextEpisode();
 
@@ -50,13 +49,6 @@ class RecurrentNnetModel : public AbstractModel
          *        neurons adapted to @p first_episode.
          */
         virtual Network *createNetwork(Episode *first_episode) const = 0;
-
-        /**
-         * @brief Return a network node that serves as an hidden layer. Its
-         *        output is used as the "hidden output" of this model.
-         * @sa hiddenValues()
-         */
-        virtual AbstractNode *hiddenNode() const = 0;
 
     private:
         Network *_network;

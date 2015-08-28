@@ -59,16 +59,6 @@ class ModelWorld : public AbstractWorld
                                     float reward);
 
         /**
-         * @brief State representation of the current state of the world.
-         *
-         * This method returns an undefined (but properly sized) result if step()
-         * or stepSupervised() were never called.
-         *
-         * @sa AbstractModel::hiddenValues()
-         */
-        void lastHiddenValues(std::vector<float> &rs);
-
-        /**
          * @brief Use a list of episodes in order to learn the model of the world
          *
          * This function uses the sequence of states encountered in the episode

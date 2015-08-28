@@ -32,7 +32,6 @@ set(SOURCES
     world/postprocessworld.cpp
     world/scaleworld.cpp
     modelbased/modelworld.cpp
-    modelbased/hiddenmodel.cpp
     modelbased/dynamodel.cpp
     main.cpp
 )

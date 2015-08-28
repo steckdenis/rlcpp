@@ -38,6 +38,11 @@ class AbstractModel
 
         /**
          * @brief Update the model using the action values of the @p episodes
+         *
+         * @note Learn might be called in another thread, while values() is used.
+         *       Learning should not interfere with prediction. For instance, learning
+         *       can occur in a separate internal model, that will be "swapped"
+         *       and made fore-ground by a call to swapModels().
          */
         virtual void learn(const std::vector<Episode *> &episodes) = 0;
 
@@ -48,17 +53,19 @@ class AbstractModel
         virtual void values(Episode *episode, std::vector<float> &rs) = 0;
 
         /**
-         * @brief Same as values(), but return a "hidden" state.
+         * @brief Tell the model to swap its training and prediction internal models
          *
-         * The default implementation simply calls values(). Some models, that
-         * try to uncover the underlying state of a POMDP, can return what they
-         * guess to be the hidden state using this method. Train will still always
-         * be called with observed state values.
+         * Learning and prediction typically occur in this order :
+         *
+         * @code
+         * learn() | values()  (called in independent threads)
+         * a mutex gets locked, synchronizing all the threads
+         * swapModels()        (does not need to lock any mutex)
+         * the mutex gets unlocked
+         * learn() | values()
+         * @endcode
          */
-        virtual void hiddenValues(Episode *episode, std::vector<float> &rs)
-        {
-            values(episode, rs);
-        }
+        virtual void swapModels() {};
 
         /**
          * @brief Faster variant of values, used when plotting the model.

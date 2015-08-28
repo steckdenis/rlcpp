@@ -39,10 +39,8 @@ class StackedGRUModel : public RecurrentNnetModel
         StackedGRUModel(unsigned int hidden_neurons);
 
         virtual Network *createNetwork(Episode *first_episode) const;
-        virtual AbstractNode *hiddenNode() const;
 
     private:
-        GRU *_gru;
         unsigned int _hidden_neurons;
 };
 

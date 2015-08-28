@@ -41,10 +41,8 @@ class PerceptronModel : public NnetModel
         PerceptronModel(unsigned int hidden_neurons);
 
         virtual Network *createNetwork(Episode *first_episode) const;
-        virtual void hiddenValues(Episode *episode, std::vector<float> &rs);
 
     private:
-        TanhActivation *_hidden_activation;
         unsigned int _hidden_neurons;
 };
 

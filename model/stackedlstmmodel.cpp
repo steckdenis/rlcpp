@@ -32,7 +32,6 @@ static const float learning_rate = 2e-3;
 StackedLSTMModel::StackedLSTMModel(unsigned int hidden_neurons)
 : _hidden_neurons(hidden_neurons)
 {
-    _lstm = new LSTM(_hidden_neurons, learning_rate);
 }
 
 Network *StackedLSTMModel::createNetwork(Episode *first_episode) const
@@ -42,29 +41,25 @@ Network *StackedLSTMModel::createNetwork(Episode *first_episode) const
     Dense *dense_ingate = new Dense(_hidden_neurons, learning_rate);
     Dense *dense_outgate = new Dense(_hidden_neurons, learning_rate);
     Dense *dense_forgetgate = new Dense(_hidden_neurons, learning_rate);
+    LSTM *lstm = new LSTM(_hidden_neurons, learning_rate);
     Dense *out = new Dense(first_episode->valueSize(), learning_rate);
 
     dense_in->setInput(net->inputPort());
     dense_ingate->setInput(net->inputPort());
     dense_outgate->setInput(net->inputPort());
     dense_forgetgate->setInput(net->inputPort());
-    _lstm->addInput(dense_in->output());
-    _lstm->addInGate(dense_ingate->output());
-    _lstm->addOutGate(dense_outgate->output());
-    _lstm->addForgetGate(dense_forgetgate->output());
-    out->setInput(_lstm->output());
+    lstm->addInput(dense_in->output());
+    lstm->addInGate(dense_ingate->output());
+    lstm->addOutGate(dense_outgate->output());
+    lstm->addForgetGate(dense_forgetgate->output());
+    out->setInput(lstm->output());
 
     net->addNode(dense_in);
     net->addNode(dense_ingate);
     net->addNode(dense_outgate);
     net->addNode(dense_forgetgate);
-    net->addNode(_lstm);
+    net->addNode(lstm);
     net->addNode(out);
 
     return net;
-}
-
-AbstractNode *StackedLSTMModel::hiddenNode() const
-{
-    return _lstm;
 }

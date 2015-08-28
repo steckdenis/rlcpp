@@ -101,25 +101,6 @@ void ModelWorld::step(unsigned int action,
     _episode->addValues(_values);
 }
 
-void ModelWorld::lastHiddenValues(std::vector<float> &rs)
-{
-    if (_episode->length() > 0) {
-        // _episode ends at the last state (the current one is still in _world_state),
-        // and its hidden values are what we are looking for
-        _model->hiddenValues(_episode, rs);
-    } else {
-        // Make a dummy episode that allows to get the size of the hidden values
-        unsigned int value_size = _world_state.size() + 2;
-        Episode dummy(value_size, value_size, _encoder);
-
-        makeModelState(_world_state, 0, _model_state);
-        dummy.addState(_model_state);
-        dummy.addAction(0);
-
-        _model->hiddenValues(&dummy, rs);
-    }
-}
-
 void ModelWorld::stepSupervised(unsigned int action,
                                 const std::vector<float> &target_state,
                                 float reward)
