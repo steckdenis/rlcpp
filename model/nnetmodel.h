@@ -26,6 +26,7 @@
 #include "abstractmodel.h"
 
 #include <nnetcpp/network.h>
+#include <mutex>
 
 /**
  * @brief Base class for non-recurrent neural networks.
@@ -58,6 +59,8 @@ class NnetModel : public AbstractModel
     private:
         Network *_network;
         Network *_learn_network;
+
+        std::mutex _mutex;
 };
 
 #endif

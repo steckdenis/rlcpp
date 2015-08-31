@@ -67,7 +67,6 @@ class DynaModel : public AbstractModel
         virtual void valuesForPlotting(Episode *episode, std::vector<float> &rs);
         virtual void learn(const std::vector<Episode *> &episodes);
         virtual void swapModels();
-        virtual void nextEpisode();
 
     private:
         ModelWorld *_world;

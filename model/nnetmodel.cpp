@@ -62,6 +62,7 @@ void NnetModel::values(Episode *episode, std::vector<float> &rs)
         vectorToVector(rs, last_state);
 
         // Feed this input to the network
+        std::unique_lock<std::mutex> lock(_mutex);
         Vector prediction = _network->predict(last_state);
 
         rs.resize(episode->valueSize());

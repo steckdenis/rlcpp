@@ -26,6 +26,7 @@
 #include "abstractmodel.h"
 
 #include <nnetcpp/network.h>
+#include <mutex>
 
 /**
  * @brief Base class for recurrent neural networks.
@@ -43,7 +44,6 @@ class RecurrentNnetModel : public AbstractModel
         virtual void values(Episode *episode, std::vector<float> &rs);
         virtual void learn(const std::vector<Episode *> &episodes);
         virtual void swapModels();
-        virtual void nextEpisode();
 
         /**
          * @brief Create a neural network having a number of input and output
@@ -56,6 +56,9 @@ class RecurrentNnetModel : public AbstractModel
         Network *_learn_network;
 
         unsigned int _last_episode_length;
+        Episode *_last_episode;
+
+        std::mutex _mutex;
 };
 
 #endif

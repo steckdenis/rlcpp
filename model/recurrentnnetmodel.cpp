@@ -29,7 +29,8 @@
 RecurrentNnetModel::RecurrentNnetModel()
 : _network(nullptr),
   _learn_network(nullptr),
-  _last_episode_length(0)
+  _last_episode_length(0),
+  _last_episode(nullptr)
 {
 }
 
@@ -41,16 +42,6 @@ RecurrentNnetModel::~RecurrentNnetModel()
 
     if (_learn_network) {
         delete _learn_network;
-    }
-}
-
-void RecurrentNnetModel::nextEpisode()
-{
-    _last_episode_length = 0;
-
-    // Reset the network between time steps
-    if (_network) {
-        _network->reset();
     }
 }
 
@@ -67,6 +58,14 @@ void RecurrentNnetModel::values(Episode *episode, std::vector<float> &rs)
         rs.resize(episode->valueSize());
         std::fill(rs.begin(), rs.end(), 0.0f);
     } else {
+        std::unique_lock<std::mutex> lock(_mutex);
+
+        if (episode != _last_episode) {
+            _last_episode_length = 0;
+            _network->reset();
+        }
+
+        // If values() is called concurrently, it might happen that
         // Use _last_episode_length..length time steps for prediction. This allows
         // the model to be kept "up-to-date" if time steps are skipped in the episode,
         // for instance of AbstractWorld copies N time steps from an episode and
@@ -95,6 +94,7 @@ void RecurrentNnetModel::values(Episode *episode, std::vector<float> &rs)
         }
 
         _last_episode_length = episode->length();
+        _last_episode = episode;
     }
 }
 

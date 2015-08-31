@@ -68,7 +68,6 @@ void ModelWorld::reset()
     }
 
     _episode = new Episode(value_size, value_size, _encoder);
-    _model->nextEpisode();
 }
 
 void ModelWorld::step(unsigned int action,
@@ -134,12 +133,14 @@ void ModelWorld::learn(const std::vector<Episode *> episodes)
     // consists in converting state sequences to state deltas.
     std::vector<float> next_state;
     std::vector<float> state;
+    std::vector<float> values;
+    std::vector<float> model_state;
 
     for (Episode *episode : episodes) {
         unsigned int value_size = episode->stateSize() + 2;
         Episode *model_episode = new Episode(value_size, value_size, _encoder);
 
-        _values.resize(value_size);
+        values.resize(value_size);
 
         for (unsigned int t = 0; t < episode->length() - 1; ++t) {
             unsigned int action = episode->action(t);
@@ -151,7 +152,7 @@ void ModelWorld::learn(const std::vector<Episode *> episodes)
 
             // Compute the state delta (between unencoded states)
             for (std::size_t i=0; i<state.size(); ++i) {
-                _values[i] = next_state[i] - state[i];
+                values[i] = next_state[i] - state[i];
             }
 
             // If we have reached the end of the episode, see whether it was
@@ -162,22 +163,22 @@ void ModelWorld::learn(const std::vector<Episode *> episodes)
                 finished = !episode->wasAborted();
             }
 
-            _values[value_size - 2] = reward;
-            _values[value_size - 1] = (finished ? 1.0f : -1.0f);
+            values[value_size - 2] = reward;
+            values[value_size - 1] = (finished ? 1.0f : -1.0f);
 
             // Add the state delta and expected prediction to the model episode
-            makeModelState(state, action, _model_state);
+            makeModelState(state, action, model_state);
 
-            model_episode->addState(_model_state);
+            model_episode->addState(model_state);
             model_episode->addAction(action);
             model_episode->addReward(reward);
-            model_episode->addValues(_values);
+            model_episode->addValues(values);
         }
 
         // Duplicate the last state and action, because the models tend to ignore
         // the last state-value pair (because it does not have an action)
-        model_episode->addState(_model_state);
-        model_episode->addValues(_values);
+        model_episode->addState(model_state);
+        model_episode->addValues(values);
         model_episode->setAborted(episode->wasAborted());
 
         model_episodes.push_back(model_episode);

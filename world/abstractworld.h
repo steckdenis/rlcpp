@@ -101,6 +101,8 @@ class AbstractWorld
          * @param encoder Encoder used to encode the states, can be nullptr for identity
          * @param verbose true if this method must print information about the
          *                rewards obtained by the agent. False for silent operation.
+         * @param swap_models true if AbstractModel::swapModels() has to be called
+         *                    each time a batch of episodes is learnt.
          * @param start_episode if not null, this episode is replayed before any
          *                      new episode. This allows to simulate a world from
          *                      a starting position (with history taken into account)
@@ -114,6 +116,7 @@ class AbstractWorld
                                    unsigned int batch_size,
                                    Episode::Encoder encoder,
                                    bool verbose = true,
+                                   bool swap_models = true,
                                    Episode *start_episode = nullptr);
 
     private:

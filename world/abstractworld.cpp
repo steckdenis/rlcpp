@@ -30,6 +30,7 @@
 #include <fstream>
 #include <algorithm>
 #include <cstdlib>
+#include <atomic>
 
 #include <signal.h>
 #include <string.h>
@@ -37,14 +38,14 @@
 /**
  * @brief Used to identify when to abort AbstractWorld::run
  */
-static sig_atomic_t abort_run = 0;
+static std::atomic<bool> abort_run(false);
 
 /**
  * @brief Called on SIGTERM, abort AbstractWorld::run
  */
 static void sigterm_handler(int)
 {
-    abort_run = 1;
+    abort_run = true;
 }
 
 AbstractWorld::AbstractWorld(unsigned int num_actions)
@@ -89,15 +90,13 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
                                           unsigned int batch_size,
                                           Episode::Encoder encoder,
                                           bool verbose,
+                                          bool swap_models,
                                           Episode *start_episode)
 {
     std::vector<Episode *> episodes;
     std::vector<Episode *> learn_episodes;
     std::vector<float> state;
     std::vector<float> values;
-
-    // No abortion of the run, currently
-    abort_run = 0;
 
     for (unsigned int e=0; e<num_episodes && !abort_run; ++e) {
         Episode *episode;
@@ -124,7 +123,6 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
         }
 
         // Initial value
-        model->nextEpisode();
         model->values(episode, values);
         episode->addValues(values);
 
@@ -180,8 +178,11 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
             if (verbose) std::cout << "Learning..." << std::flush;
 
             model->learn(learn_episodes);
-            model->swapModels();
             learn_episodes.clear();
+
+            if (swap_models) {
+                model->swapModels();
+            }
 
             if (verbose) std::cout << "done" << std::endl;
         }
@@ -240,7 +241,6 @@ void AbstractWorld::plotModel(AbstractModel *model, Episode::Encoder encoder)
             }
 
             // Query the values from the model
-            model->nextEpisode();
             model->valuesForPlotting(&episode, values);
 
             // And print them in the output streams

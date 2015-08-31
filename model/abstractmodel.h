@@ -49,6 +49,9 @@ class AbstractModel
         /**
          * @brief Return the action values corresponding to the last state of
          *        @p episode.
+         *
+         * @warning This method must be thread-safe as it will be called concurrently
+         *          by several threads without any lock.
          */
         virtual void values(Episode *episode, std::vector<float> &rs) = 0;
 
@@ -77,16 +80,6 @@ class AbstractModel
         {
             values(episode, rs);
         }
-
-        /**
-         * @brief Called at the beginning of an episode, before the first
-         *        time step of the episode is predicted.
-         *
-         * This can be used by time-series models to start a new episode. For
-         * instance, a time-step counter can be reset to 0. values() will then
-         * use counter..episode->length() values for prediction.
-         */
-        virtual void nextEpisode() {}
 };
 
 #endif
