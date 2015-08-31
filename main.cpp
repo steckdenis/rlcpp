@@ -35,6 +35,7 @@
 #include "world/polargridworld.h"
 #include "world/scaleworld.h"
 #include "modelbased/dynamodel.h"
+#include "modelbased/texploremodel.h"
 
 #ifdef ROSCPP_FOUND
     #include "world/rosworld.h"
@@ -173,8 +174,10 @@ int main(int argc, char **argv) {
             model = new StackedLSTMModel(hidden_neurons);
             world_model = new StackedLSTMModel(hidden_neurons);
         } else if (arg == "qlearning") {
+            rollout_learning = new QLearning(discount_factor, eligibility_factor, learning_factor);
             learning = new QLearning(discount_factor, eligibility_factor, learning_factor);
         } else if (arg == "advantage") {
+            rollout_learning = new AdvantageLearning(discount_factor, eligibility_factor, learning_factor, 0.5);
             learning = new AdvantageLearning(discount_factor, eligibility_factor, learning_factor, 0.5);
         } else if (arg == "softmax") {
             if (learning == nullptr) {
@@ -182,7 +185,7 @@ int main(int argc, char **argv) {
                 return 1;
             }
 
-            rollout_learning = new SoftmaxLearning(learning, 3.0f);
+            rollout_learning = new SoftmaxLearning(rollout_learning, 3.0f);
             learning = new SoftmaxLearning(learning, 0.5);
         } else if (arg == "adaptivesoftmax") {
             if (learning == nullptr) {
@@ -190,7 +193,7 @@ int main(int argc, char **argv) {
                 return 1;
             }
 
-            rollout_learning = new AdaptiveSoftmaxLearning(learning, 0.4);
+            rollout_learning = new AdaptiveSoftmaxLearning(rollout_learning, 0.4);
             learning = new AdaptiveSoftmaxLearning(learning, 0.2);
         } else if (arg == "egreedy") {
             if (learning == nullptr) {
@@ -198,7 +201,7 @@ int main(int argc, char **argv) {
                 return 1;
             }
 
-            rollout_learning = new EGreedyLearning(learning, 0.6);
+            rollout_learning = new EGreedyLearning(rollout_learning, 0.6);
             learning = new EGreedyLearning(learning, 0.2);
         } else if (arg == "dyna") {
             if (world == nullptr || model == nullptr || rollout_learning == nullptr) {
@@ -213,6 +216,20 @@ int main(int argc, char **argv) {
                 rollout_learning,
                 rollout_length,
                 num_rollouts,
+                encoder
+            );
+        } else if (arg == "texplore") {
+            if (world == nullptr || model == nullptr || rollout_learning == nullptr) {
+                std::cerr << "texplore can be used only after a world, a model and a learning algorithm" << std::endl;
+                return 1;
+            }
+
+            model = new TEXPLOREModel(
+                world,
+                world_model,
+                model,
+                rollout_learning,
+                rollout_length,
                 encoder
             );
         }

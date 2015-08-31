@@ -33,6 +33,7 @@ set(SOURCES
     world/scaleworld.cpp
     modelbased/modelworld.cpp
     modelbased/dynamodel.cpp
+    modelbased/texploremodel.cpp
     main.cpp
 )
 
@@ -44,5 +45,6 @@ endif(ROSCPP_FOUND)
 add_executable(rlcpp ${SOURCES})
 target_link_libraries(rlcpp
     nnetcpp
+    pthread
     ${ROSCPP_LDFLAGS}
 )
