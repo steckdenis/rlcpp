@@ -44,6 +44,8 @@ NnetModel::~NnetModel()
 
 void NnetModel::swapModels()
 {
+    std::unique_lock<std::mutex> lock(_mutex);
+
     // Swap the learning and prediction networks
     std::swap(_network, _learn_network);
 }

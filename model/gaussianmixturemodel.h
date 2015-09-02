@@ -28,6 +28,7 @@
 #include <Eigen/Dense>
 #include <vector>
 #include <random>
+#include <mutex>
 
 class GaussianMixture;
 
@@ -69,6 +70,8 @@ class GaussianMixtureModel : public AbstractModel
 
         std::vector<GaussianMixture *> _models;     /*!< @brief One model per action */
         std::vector<GaussianMixture *> _learn_models;
+
+        std::mutex _models_mutex;
 };
 
 #endif

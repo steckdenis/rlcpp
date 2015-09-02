@@ -77,8 +77,7 @@ class TEXPLOREModel : public AbstractModel
         std::vector<Episode *> _base_episodes;
         std::atomic<Episode *> _base_episode;                       // Episode from which rollouts are performed
 
-        std::mutex _model_lock;
-        std::mutex _world_lock;
+        std::mutex _base_episodes_lock;
         std::mutex _world_episodes_lock;
         std::condition_variable _world_episodes_cond;
 

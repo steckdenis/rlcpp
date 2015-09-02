@@ -62,11 +62,13 @@ class AbstractModel
          *
          * @code
          * learn() | values()  (called in independent threads)
-         * a mutex gets locked, synchronizing all the threads
          * swapModels()        (does not need to lock any mutex)
-         * the mutex gets unlocked
          * learn() | values()
          * @endcode
+         *
+         * @warning This method must be thread-safe with regards to values(): it
+         *          will never be called concurrently with learn(), but can be
+         *          called concurrently with values().
          */
         virtual void swapModels() = 0;
 

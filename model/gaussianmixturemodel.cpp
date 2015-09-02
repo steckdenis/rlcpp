@@ -50,6 +50,8 @@ GaussianMixtureModel::~GaussianMixtureModel()
 
 void GaussianMixtureModel::swapModels()
 {
+    std::unique_lock<std::mutex> lock(_models_mutex);
+
     // Delete the models, as they will be replaced
     for (GaussianMixture *model : _models) {
         delete model;
@@ -66,6 +68,8 @@ void GaussianMixtureModel::values(Episode *episode, std::vector<float> &rs)
         rs.resize(episode->valueSize());
         std::fill(rs.begin(), rs.end(), 0.0f);
     } else {
+        std::unique_lock<std::mutex> lock(_models_mutex);
+
         // Convert the last state to an Eigen vector
         Eigen::VectorXf input(episode->stateSize());
 

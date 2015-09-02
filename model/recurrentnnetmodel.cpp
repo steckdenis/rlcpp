@@ -47,19 +47,23 @@ RecurrentNnetModel::~RecurrentNnetModel()
 
 void RecurrentNnetModel::swapModels()
 {
+    std::unique_lock<std::mutex> lock(_mutex);
     std::swap(_network, _learn_network);
+
+    // Tell values() that the network has changed and that it must reset it
+    _last_episode = nullptr;
 }
 
 
 void RecurrentNnetModel::values(Episode *episode, std::vector<float> &rs)
 {
+    std::unique_lock<std::mutex> lock(_mutex);
+
     if (!_network) {
         // No model available, clear out rs
         rs.resize(episode->valueSize());
         std::fill(rs.begin(), rs.end(), 0.0f);
     } else {
-        std::unique_lock<std::mutex> lock(_mutex);
-
         if (episode != _last_episode) {
             _last_episode_length = 0;
             _network->reset();
@@ -72,6 +76,7 @@ void RecurrentNnetModel::values(Episode *episode, std::vector<float> &rs)
         // then tries to predict the next one.
         for (unsigned int t=_last_episode_length; t<episode->length(); ++t) {
             // Tell the network which time-step it considers
+            //std::cout << _network << ' ' << _learn_network << std::endl;
             _network->setCurrentTimestep(t);
 
             // Convert the last state to an Eigen vector
@@ -110,6 +115,7 @@ void RecurrentNnetModel::learn(const std::vector<Episode *> &episodes)
     }
 
     if (_network) {
+        std::unique_lock<std::mutex> lock(_mutex);
         NetworkSerializer serializer;
 
         _network->serialize(serializer);

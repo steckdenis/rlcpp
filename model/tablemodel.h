@@ -26,6 +26,7 @@
 #include "abstractmodel.h"
 
 #include <unordered_map>
+#include <mutex>
 
 /**
  * @brief Simple model that stores action values in a dictionary indexed by state
@@ -55,6 +56,8 @@ class TableModel : public AbstractModel
 
         Table _table;
         Table _learn_table;
+
+        std::mutex _mutex;
 };
 
 #endif

@@ -28,12 +28,16 @@
 
 void TableModel::swapModels()
 {
+    std::unique_lock<std::mutex> lock(_mutex);
+
     // Copy the learning table to the prediction table
     _table = _learn_table;
 }
 
 void TableModel::values(Episode *episode, std::vector<float> &rs)
 {
+    std::unique_lock<std::mutex> lock(_mutex);
+
     episode->state(episode->length() - 1, rs);
     auto it = _table.find(rs);
 

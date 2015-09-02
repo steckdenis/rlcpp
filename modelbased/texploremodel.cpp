@@ -51,6 +51,7 @@ TEXPLOREModel::~TEXPLOREModel()
 {
     // Tell the threads that they should finish
     _finish = true;
+    _world_episodes_cond.notify_one();
 
     // Join the threads
     _update_world_thread.join();
@@ -72,20 +73,24 @@ TEXPLOREModel::~TEXPLOREModel()
 
 void TEXPLOREModel::updateWorldThread()
 {
-    std::vector<Episode *> episodes;
+    std::vector<Episode *> episodes(1);
 
-    while (!_finish) {
-        // Copy _world_episodes to episodes, so that learning can happen on a
-        // list of episodes that will not change and is not accessed by other threads.
+    while (true) {
+        // Take the last episode from _world_episodes. This allows the model
+        // to learn mainly on fresh, interesting and accurate episodes.
         {
             std::unique_lock<std::mutex> lock(_world_episodes_lock);
 
-            while (_world_episodes.size() == 0) {
+            while (_world_episodes.size() == 0 && !_finish) {
                 _world_episodes_cond.wait(lock);
             }
 
-            episodes = _world_episodes;
-            _world_episodes.clear();
+            if (_finish) {
+                break;
+            } else {
+                episodes[0] = _world_episodes.back();
+                _world_episodes.pop_back();
+            }
         }
 
         // Learn
@@ -98,11 +103,7 @@ void TEXPLOREModel::updateWorldThread()
         }
 
         // Use the new world for the rollouts
-        {
-            std::unique_lock<std::mutex> lock(_world_lock);
-
-            _world_model->swapModels();
-        }
+        _world_model->swapModels();
     }
 }
 
@@ -112,34 +113,25 @@ void TEXPLOREModel::updateModelThread()
 
     // Perform rollouts until the thread has to end
     while (!_finish) {
-        {
-            std::unique_lock<std::mutex> lock(_world_lock);     // _world->run() uses the world model, that must therefore be locked.
-
-            episodes = _world->run(_model,
-                                   _learning,
-                                   1,
-                                   _rollout_length,
-                                   1,
-                                   _encoder,
-                                   false,
-                                   false,
-                                   _base_episode);
-        }
+        episodes = _world->run(_model,
+                               _learning,
+                               1,
+                               _rollout_length,
+                               1,
+                               _encoder,
+                               false,
+                               _base_episode);
 
         for (Episode *e : episodes) {
             delete e;   // Don't leak the rollout episodes
         }
 
-        // Swap the models so that the main thread can use updated action values
         {
-            std::unique_lock<std::mutex> lock(_model_lock);
-
-            _model->swapModels();
+            std::unique_lock<std::mutex> lock(_base_episodes_lock);
 
             // Delete the base episodes that are not needed anymore (the latest
             // episode is in _base_episode but not _base_episodes, so it will
-            // not be deleted). _model_lock is the lock used by values(), which
-            // explains why these deletions are performed here.
+            // not be deleted).
             for (Episode *e : _base_episodes) {
                 delete e;
             }
@@ -156,8 +148,6 @@ void TEXPLOREModel::values(Episode *episode, std::vector<float> &rs)
     usleep(200);
 
     // Use the model trained by the rollouts to predict the values
-    std::unique_lock<std::mutex> lock(_model_lock);
-
     _model->values(episode, rs);
 
     // Swap _base_episode with a new copy of episode, so that rollouts start
@@ -165,6 +155,8 @@ void TEXPLOREModel::values(Episode *episode, std::vector<float> &rs)
     Episode *old_episode = _base_episode.exchange(new Episode(*episode));
 
     if (old_episode) {
+        std::unique_lock<std::mutex> lock(_base_episodes_lock);
+
         // Keep track of all the base episodes so that they can be deleted when
         // not needed anymore
         _base_episodes.push_back(old_episode);

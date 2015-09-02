@@ -54,7 +54,6 @@ void DynaModel::values(Episode *episode, std::vector<float> &rs)
                                                       _num_rollouts,
                                                       _encoder,
                                                       false,
-                                                      true,
                                                       episode);
 
         for (Episode *e : episodes) {

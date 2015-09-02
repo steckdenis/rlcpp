@@ -90,7 +90,6 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
                                           unsigned int batch_size,
                                           Episode::Encoder encoder,
                                           bool verbose,
-                                          bool swap_models,
                                           Episode *start_episode)
 {
     std::vector<Episode *> episodes;
@@ -178,11 +177,8 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
             if (verbose) std::cout << "Learning..." << std::flush;
 
             model->learn(learn_episodes);
+            model->swapModels();
             learn_episodes.clear();
-
-            if (swap_models) {
-                model->swapModels();
-            }
 
             if (verbose) std::cout << "done" << std::endl;
         }
