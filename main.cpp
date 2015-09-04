@@ -120,7 +120,7 @@ int main(int argc, char **argv) {
             num_episodes = 50000;
             discount_factor = 0.98f;
 
-            world = new TMazeWorld(8, 1000);
+            world = new TMazeWorld(8, 1);
         } else if (arg == "gridworld" || arg == "polargridworld") {
             GridWorld::Point initial, obstacle, goal;
 
@@ -193,8 +193,8 @@ int main(int argc, char **argv) {
                 return 1;
             }
 
-            rollout_learning = new AdaptiveSoftmaxLearning(rollout_learning, 0.4);
-            learning = new AdaptiveSoftmaxLearning(learning, 0.2);
+            rollout_learning = new AdaptiveSoftmaxLearning(rollout_learning, 0.1);
+            learning = new AdaptiveSoftmaxLearning(learning, 0.05);
         } else if (arg == "egreedy") {
             if (learning == nullptr) {
                 std::cerr << "Put egreedy after the learning algorithm to be filtered" << std::endl;

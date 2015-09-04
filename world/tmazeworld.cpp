@@ -101,7 +101,7 @@ void TMazeWorld::step(unsigned int action,
         finished = false;
     } else {
         // Simple move
-        reward = 0.0f;
+        reward = -0.1f;
         finished = false;
 
         _pos = pos_x;
