@@ -30,6 +30,7 @@
 #include "model/perceptronmodel.h"
 #include "model/stackedgrumodel.h"
 #include "model/stackedlstmmodel.h"
+#include "model/parallelgrumodel.h"
 #include "world/tmazeworld.h"
 #include "world/gridworld.h"
 #include "world/polargridworld.h"
@@ -170,6 +171,9 @@ int main(int argc, char **argv) {
         } else if (arg == "stackedgru") {
             model = new StackedGRUModel(hidden_neurons);
             world_model = new StackedGRUModel(hidden_neurons);
+        } else if (arg == "parallelgru") {
+            model = new ParallelGRUModel(hidden_neurons);
+            world_model = new ParallelGRUModel(hidden_neurons);
         } else if (arg == "stackedlstm") {
             model = new StackedLSTMModel(hidden_neurons);
             world_model = new StackedLSTMModel(hidden_neurons);
