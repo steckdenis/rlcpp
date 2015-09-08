@@ -64,7 +64,7 @@ void RecurrentNnetModel::values(Episode *episode, std::vector<float> &rs)
         rs.resize(episode->valueSize());
         std::fill(rs.begin(), rs.end(), 0.0f);
     } else {
-        if (episode != _last_episode) {
+        if (episode != _last_episode || _last_episode_length >= episode->length()) {
             _last_episode_length = 0;
             _network->reset();
         }
