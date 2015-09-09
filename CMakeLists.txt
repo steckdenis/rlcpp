@@ -11,9 +11,11 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${EIGEN3_INCLUDE_DIRS})
 
 set(SOURCES
     functionapproximators/gaussianmixture.cpp
+    functionapproximators/fusionart.cpp
     model/episode.cpp
     model/tablemodel.cpp
     model/gaussianmixturemodel.cpp
+    model/fusionartmodel.cpp
     model/nnetmodel.cpp
     model/perceptronmodel.cpp
     model/recurrentnnetmodel.cpp

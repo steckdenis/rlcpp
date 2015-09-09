@@ -27,6 +27,7 @@
 #include "learning/egreedylearning.h"
 #include "model/tablemodel.h"
 #include "model/gaussianmixturemodel.h"
+#include "model/fusionartmodel.h"
 #include "model/perceptronmodel.h"
 #include "model/stackedgrumodel.h"
 #include "model/stackedlstmmodel.h"
@@ -163,6 +164,9 @@ int main(int argc, char **argv) {
             // Tailored for the gridworld
             model = new GaussianMixtureModel(0.60, 0.20, 0.05, true);
             world_model = new GaussianMixtureModel(0.60, 0.20, 0.05, false);
+        } else if (arg == "fusionart") {
+            model = new FusionARTModel(true);
+            world_model = new FusionARTModel(false);
         } else if (arg == "perceptron") {
             model = new PerceptronModel(hidden_neurons);
             world_model = new PerceptronModel(hidden_neurons);
