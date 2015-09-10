@@ -34,6 +34,8 @@ set(SOURCES
     world/polargridworld.cpp
     world/postprocessworld.cpp
     world/scaleworld.cpp
+    deviceworld/deviceworld.cpp
+    deviceworld/deviceintegratorworld.cpp
     modelbased/modelworld.cpp
     modelbased/dynamodel.cpp
     modelbased/texploremodel.cpp

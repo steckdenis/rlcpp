@@ -20,26 +20,35 @@
  * THE SOFTWARE.
  */
 
-#ifndef __POSTPROCESSWORLD_H__
-#define __POSTPROCESSWORLD_H__
+#ifndef __DEVICEWORLD_H__
+#define __DEVICEWORLD_H__
 
-#include "abstractworld.h"
+#include "world/postprocessworld.h"
 
 /**
- * @brief World that wraps another ones and postprocesses the states it produces
+ * @brief World that wraps another one and adds a device to it.
+ *
+ * A device extends a world with actions, observations and rewards. The agent can
+ * learn to use the actions in order to change the internal state of the device,
+ * from which one or several observations are built. The device adds those observations
+ * to the observations returned by the wrapped world. It can also change the
+ * reward returned by the wrapped world.
  */
-class PostProcessWorld : public AbstractWorld
+class DeviceWorld : public PostProcessWorld
 {
     public:
         /**
          * @param world World to be wrapped
-         * @param weights Values by which the state variables are multiplied
+         * @param device_actions Number of actions added by the device
          */
-        PostProcessWorld(AbstractWorld *world, unsigned int num_actions);
-        virtual ~PostProcessWorld();
+        DeviceWorld(AbstractWorld *world, unsigned int device_actions);
 
         virtual void initialState(std::vector<float> &state);
-        virtual void reset();
+
+        /**
+         * @brief Detect actions of this device and perform them instead of sending
+         *        them to the wrapped world.
+         */
         virtual void step(unsigned int action,
                           bool &finished,
                           float &reward,
@@ -47,12 +56,16 @@ class PostProcessWorld : public AbstractWorld
 
     protected:
         /**
-         * @brief Post-process a state
+         * @brief Perform a device action
+         * @return Reward produced by the action, that is added to the reward
+         *         returned by the world.
          */
-        virtual void processState(std::vector<float> &state) = 0;
+        virtual float performAction(unsigned int action) = 0;
 
-    protected:
-        AbstractWorld *_world;
+    private:
+        unsigned int _first_action;
+
+        std::vector<float> _last_state;         /*!< @brief When a device action is performed, the state of the wrapped world does not change and must therefore be preserved */
 };
 
 #endif

@@ -20,39 +20,45 @@
  * THE SOFTWARE.
  */
 
-#include "postprocessworld.h"
+#include "deviceworld.h"
 
-#include <cmath>
-#include <iostream>
-
-PostProcessWorld::PostProcessWorld(AbstractWorld *world, unsigned int num_actions)
-: AbstractWorld(num_actions),
-  _world(world)
+DeviceWorld::DeviceWorld(AbstractWorld *world,
+                         unsigned int device_actions)
+: PostProcessWorld(world, world->numActions() + device_actions),
+  _first_action(world->numActions())
 {
 }
 
-PostProcessWorld::~PostProcessWorld()
+void DeviceWorld::initialState(std::vector<float> &state)
 {
-    delete _world;
-}
-
-void PostProcessWorld::initialState(std::vector <float> &state)
-{
+    // Store the initial unprocessed state in _last_state so that device actions
+    // can immediately be issued, then postprocess that state.
     _world->initialState(state);
+    _last_state = state;
+
     processState(state);
 }
 
-void PostProcessWorld::reset()
-{
-    _world->reset();
-}
-
-void PostProcessWorld::step(unsigned int action,
+void DeviceWorld::step(unsigned int action,
                        bool &finished,
                        float &reward,
                        std::vector<float> &state)
 {
-    // Let the wrapped world compute the step, then post-process it
-    _world->step(action, finished, reward, state);
+    if (action < _first_action) {
+        // Normal world action, let the world execute it
+        _world->step(action, finished, reward, state);
+
+        // Save the world state so that it can be used again if a device action
+        // is performed
+        _last_state = state;
+    } else {
+        // Perform the device action
+        reward = performAction(action - _first_action);
+        state = _last_state;
+        finished = false;
+    }
+
+    // Post-process the state. This allows the device to add its observations
+    // to the state.
     processState(state);
 }

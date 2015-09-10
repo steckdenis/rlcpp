@@ -36,6 +36,7 @@
 #include "world/gridworld.h"
 #include "world/polargridworld.h"
 #include "world/scaleworld.h"
+#include "deviceworld/deviceintegratorworld.h"
 #include "modelbased/dynamodel.h"
 #include "modelbased/texploremodel.h"
 
@@ -144,6 +145,12 @@ int main(int argc, char **argv) {
                 return 1;
             }
             world = new ScaleWorld(world, {1.0f, 0.0f});
+        } else if (arg == "integrator") {
+            if (world == nullptr) {
+                std::cerr << "Put integrator after the world to be wrapped" << std::endl;
+                return 1;
+            }
+            world = new DeviceIntegratorWorld(world, 0.0f, 1.0f);
 #ifdef ROSCPP_FOUND
         } else if (arg == "rospendulum") {
             batch_size = 1;

@@ -20,35 +20,43 @@
  * THE SOFTWARE.
  */
 
-#ifndef __SCALEWORLD_H__
-#define __SCALEWORLD_H__
+#ifndef __DEVICEINTEGRATORWORLD_H__
+#define __DEVICEINTEGRATORWORLD_H__
 
-#include "postprocessworld.h"
+#include "deviceworld.h"
 
 /**
- * @brief World that wraps another one and encodes scales its observations.
+ * @brief World that wraps another one and adds an "integrator" device
  *
- * This can be used for normalization (for neural networks), or for multiplying
- * some state variables by 0.0, hence making the world partially observable.
+ * This world adds two possible actions and one observation. The actions are
+ * "increment" and "decrement", and the observation is the value of the integrator.
+ * Its initial value is zero.
+ *
+ * The agent can learn to use this world to count events or set flags, which allows
+ * an normally MDP-only to solve some simple POMDPs.
  */
-class ScaleWorld : public PostProcessWorld
+class DeviceIntegratorWorld : public DeviceWorld
 {
     public:
-        /**
-         * @param world World to be wrapped
-         * @param weights Values by which the state variables are multiplied
-         */
-        ScaleWorld(AbstractWorld *world,
-                   const std::vector<float> &weights);
+        DeviceIntegratorWorld(AbstractWorld *world, float min, float max);
+
+        virtual void reset() override;
 
     protected:
         /**
-         * @brief Scale a state according to the weight vector
+         * @brief Increment or decrement the integrator
+         */
+        virtual float performAction(unsigned int action) override;
+
+        /**
+         * @brief Add the observation to the state returned by the wrapped world
          */
         virtual void processState(std::vector<float> &state) override;
 
     private:
-        std::vector<float> _weights;
+        float _min;
+        float _max;
+        float _value;
 };
 
 #endif

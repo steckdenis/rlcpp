@@ -190,8 +190,7 @@ std::vector<Episode *> AbstractWorld::run(AbstractModel *model,
 void AbstractWorld::plotModel(AbstractModel *model, Episode::Encoder encoder)
 {
     if (_min_state.size() > 2) {
-        std::cout << "Cannot plot models with more than 2 state variables" << std::endl;
-        return;
+        std::cout << "Only the first two variables of the model will be plotted" << std::endl;
     }
 
     // Define some variables that allow to handle 1D and 2D worlds in a generic way
@@ -214,7 +213,7 @@ void AbstractWorld::plotModel(AbstractModel *model, Episode::Encoder encoder)
     }
 
     // Sample the model at regular points
-    std::vector<float> state(_min_state.size());
+    std::vector<float> state = _min_state;      // Start with _min_state. This way, variables beyond x and y have a definite value (the one from _min_state)
     std::vector<float> values;
 
     for (float y = min_y; y < max_y; y += dy) {

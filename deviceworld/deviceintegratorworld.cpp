@@ -20,35 +20,42 @@
  * THE SOFTWARE.
  */
 
-#ifndef __SCALEWORLD_H__
-#define __SCALEWORLD_H__
+#include "deviceintegratorworld.h"
 
-#include "postprocessworld.h"
-
-/**
- * @brief World that wraps another one and encodes scales its observations.
- *
- * This can be used for normalization (for neural networks), or for multiplying
- * some state variables by 0.0, hence making the world partially observable.
- */
-class ScaleWorld : public PostProcessWorld
+DeviceIntegratorWorld::DeviceIntegratorWorld(AbstractWorld *world, float min, float max)
+: DeviceWorld(world, 2),
+  _min(min),
+  _max(max),
+  _value(0.0f)
 {
-    public:
-        /**
-         * @param world World to be wrapped
-         * @param weights Values by which the state variables are multiplied
-         */
-        ScaleWorld(AbstractWorld *world,
-                   const std::vector<float> &weights);
+}
 
-    protected:
-        /**
-         * @brief Scale a state according to the weight vector
-         */
-        virtual void processState(std::vector<float> &state) override;
+void DeviceIntegratorWorld::reset()
+{
+    DeviceWorld::reset();
 
-    private:
-        std::vector<float> _weights;
-};
+    _value = 0.0f;
+}
 
-#endif
+float DeviceIntegratorWorld::performAction(unsigned int action)
+{
+    float old_value = _value;
+
+    switch (action) {
+        case 0:
+            _value = std::min(_max, _value + 1.0f);
+            break;
+
+        case 1:
+            _value = std::max(_min, _value - 1.0f);
+            break;
+    }
+
+    return (old_value == _value ? -2.0f : -1.0f);        // Give a penalty when the agent does something useless
+}
+
+void DeviceIntegratorWorld::processState(std::vector<float> &state)
+{
+    // Add the value to the state
+    state.push_back(_value);
+}
