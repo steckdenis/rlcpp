@@ -20,9 +20,9 @@
  * THE SOFTWARE.
  */
 
-#include "deviceintegratorworld.h"
+#include "integratordeviceworld.h"
 
-DeviceIntegratorWorld::DeviceIntegratorWorld(AbstractWorld *world, float min, float max)
+IntegratorDeviceWorld::IntegratorDeviceWorld(AbstractWorld *world, float min, float max)
 : DeviceWorld(world, 2),
   _min(min),
   _max(max),
@@ -30,14 +30,14 @@ DeviceIntegratorWorld::DeviceIntegratorWorld(AbstractWorld *world, float min, fl
 {
 }
 
-void DeviceIntegratorWorld::reset()
+void IntegratorDeviceWorld::reset()
 {
     DeviceWorld::reset();
 
     _value = 0.0f;
 }
 
-float DeviceIntegratorWorld::performAction(unsigned int action)
+float IntegratorDeviceWorld::performAction(unsigned int action)
 {
     float old_value = _value;
 
@@ -54,7 +54,7 @@ float DeviceIntegratorWorld::performAction(unsigned int action)
     return (old_value == _value ? -2.0f : -1.0f);        // Give a penalty when the agent does something useless
 }
 
-void DeviceIntegratorWorld::processState(std::vector<float> &state)
+void IntegratorDeviceWorld::processState(std::vector<float> &state)
 {
     // Add the value to the state
     state.push_back(_value);

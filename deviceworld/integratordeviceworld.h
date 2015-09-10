@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef __DEVICEINTEGRATORWORLD_H__
-#define __DEVICEINTEGRATORWORLD_H__
+#ifndef __INTEGRATORDEVICEWORLD_H__
+#define __INTEGRATORDEVICEWORLD_H__
 
 #include "deviceworld.h"
 
@@ -35,10 +35,10 @@
  * The agent can learn to use this world to count events or set flags, which allows
  * an normally MDP-only to solve some simple POMDPs.
  */
-class DeviceIntegratorWorld : public DeviceWorld
+class IntegratorDeviceWorld : public DeviceWorld
 {
     public:
-        DeviceIntegratorWorld(AbstractWorld *world, float min, float max);
+        IntegratorDeviceWorld(AbstractWorld *world, float min, float max);
 
         virtual void reset() override;
 

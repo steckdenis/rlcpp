@@ -35,7 +35,7 @@ set(SOURCES
     world/postprocessworld.cpp
     world/scaleworld.cpp
     deviceworld/deviceworld.cpp
-    deviceworld/deviceintegratorworld.cpp
+    deviceworld/integratordeviceworld.cpp
     modelbased/modelworld.cpp
     modelbased/dynamodel.cpp
     modelbased/texploremodel.cpp
