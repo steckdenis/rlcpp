@@ -37,6 +37,7 @@
 #include "world/polargridworld.h"
 #include "world/scaleworld.h"
 #include "deviceworld/integratordeviceworld.h"
+#include "deviceworld/freezedeviceworld.h"
 #include "modelbased/dynamodel.h"
 #include "modelbased/texploremodel.h"
 
@@ -120,7 +121,7 @@ int main(int argc, char **argv) {
         } else if (arg == "oneofn") {
             encoder = &oneOfNEncoder;
         } else if (arg == "tmaze") {
-            num_episodes = 50000;
+            num_episodes = 500000;
             discount_factor = 0.98f;
 
             world = new TMazeWorld(8, 1);
@@ -151,6 +152,12 @@ int main(int argc, char **argv) {
                 return 1;
             }
             world = new IntegratorDeviceWorld(world, 0.0f, 1.0f);
+        } else if (arg == "freeze") {
+            if (world == nullptr) {
+                std::cerr << "Put freeze after the world to be wrapped" << std::endl;
+                return 1;
+            }
+            world = new FreezeDeviceWorld(world);
 #ifdef ROSCPP_FOUND
         } else if (arg == "rospendulum") {
             batch_size = 1;

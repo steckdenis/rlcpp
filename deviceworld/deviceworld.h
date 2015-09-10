@@ -62,10 +62,11 @@ class DeviceWorld : public PostProcessWorld
          */
         virtual float performAction(unsigned int action) = 0;
 
+    protected:
+        std::vector<float> _last_state;         /*!< @brief When a device action is performed, the state of the wrapped world does not change and must therefore be preserved */
+
     private:
         unsigned int _first_action;
-
-        std::vector<float> _last_state;         /*!< @brief When a device action is performed, the state of the wrapped world does not change and must therefore be preserved */
 };
 
 #endif
