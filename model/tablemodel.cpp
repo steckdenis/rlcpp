@@ -83,10 +83,10 @@ void TableModel::learn(const std::vector<Episode *> &episodes)
 std::size_t TableModel::v_hash::operator()(const std::vector<float> &vector) const
 {
     std::size_t acc = 0;
-    auto h = std::hash<float>();
+    auto h = std::hash<int>();
 
     for (float f : vector) {
-        acc ^= h(f);
+        acc ^= h(f - 0.5f);
     }
 
     return acc;
@@ -98,5 +98,7 @@ bool TableModel::v_equal::operator()(const std::vector<float> &a, const std::vec
         return false;
     }
 
-    return std::equal(a.begin(), a.end(), b.begin());
+    return std::equal(a.begin(), a.end(), b.begin(), [](float a, float b) {
+        return int(a - 0.5f) == int(b - 0.5f);
+    });
 }

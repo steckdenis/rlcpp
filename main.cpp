@@ -104,6 +104,7 @@ int main(int argc, char **argv) {
 
     // Enable FPU exceptions so that NaN and infinites can be traced back
     feenableexcept(FE_INVALID);
+    srand(time(nullptr));
 
     AbstractWorld *world = nullptr;
     AbstractModel *model = nullptr;
@@ -121,7 +122,7 @@ int main(int argc, char **argv) {
         } else if (arg == "oneofn") {
             encoder = &oneOfNEncoder;
         } else if (arg == "tmaze") {
-            num_episodes = 500000;
+            num_episodes = 50000;
             discount_factor = 0.98f;
 
             world = new TMazeWorld(8, 1);
