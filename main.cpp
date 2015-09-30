@@ -28,6 +28,7 @@
 #include "model/tablemodel.h"
 #include "model/gaussianmixturemodel.h"
 #include "model/fusionartmodel.h"
+#include "model/psrmodel.h"
 #include "model/perceptronmodel.h"
 #include "model/stackedgrumodel.h"
 #include "model/stackedlstmmodel.h"
@@ -182,6 +183,10 @@ int main(int argc, char **argv) {
         } else if (arg == "fusionart") {
             model = new FusionARTModel(true);
             world_model = new FusionARTModel(false);
+        } else if (arg == "psr") {
+            batch_size = 1;
+            model = new PSRModel(5, 5, 10, 100);
+            world_model = new PSRModel(5, 5, 10, 100);
         } else if (arg == "perceptron") {
             model = new PerceptronModel(hidden_neurons);
             world_model = new PerceptronModel(hidden_neurons);

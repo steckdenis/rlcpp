@@ -231,12 +231,14 @@ void AbstractWorld::plotModel(AbstractModel *model, Episode::Encoder encoder)
             // can see a sequence, fill-up their caches and statistics, etc.
             for (int i=0; i<5; ++i) {
                 episode.addState(state);
+
+                // Query the values from the model
+                model->valuesForPlotting(&episode, values);
+
                 episode.addAction(0);
                 episode.addReward(0.0f);
+                episode.addValues(values);
             }
-
-            // Query the values from the model
-            model->valuesForPlotting(&episode, values);
 
             // And print them in the output streams
             for (unsigned int action=0; action<_num_actions; ++action) {
